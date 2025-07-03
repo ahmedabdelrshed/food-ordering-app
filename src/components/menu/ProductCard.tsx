@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
-import { Button } from "../ui/button";
 import { formatCurrency } from "@/lib/formatCurrency";
+import AddToCartModel from "./AddToCartModel";
 
 const ProductCard = () => {
   return (
@@ -21,10 +21,15 @@ const ProductCard = () => {
         <h4 className="font-semibold text-xl my-3">Pizza</h4>
         <strong className="text-accent">{formatCurrency(55.22)}</strong>
       </div>
-          <p className="text-gray-500 text-sm line-clamp-3">
-               Pizza description 
-          </p>
-          <Button className="mt-4 rounded-full px-8">Add to cart</Button>
+      <p className="text-gray-500 text-sm line-clamp-3">Pizza description</p>
+      <AddToCartModel
+        item={{
+          name: "Pizza",
+          image: "/images/pizza.png",
+          description: "Pizza description",
+          price: '55.22',
+        }}
+      />
     </li>
   );
 };

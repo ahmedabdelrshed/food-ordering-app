@@ -25,11 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
-        <div className="min-h-screen relative">
           <Header />
           {children}
           <Footer />
-        </div>
       </body>
     </html>
   );

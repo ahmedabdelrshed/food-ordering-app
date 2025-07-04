@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/formatCurrency";
 import AddToCartModel from "./AddToCartModel";
 import { TProductWithRelations } from "@/types/product";
 
-const ProductCard = ({item}:{item:TProductWithRelations}) => {
+const ProductCard = ({ item }: { item: TProductWithRelations }) => {
   return (
     <li
       className="p-6 rounded-lg text-center bg-[#f1f4f5]
@@ -19,7 +19,7 @@ const ProductCard = ({item}:{item:TProductWithRelations}) => {
         />
       </div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-xl my-3">Pizza</h4>
+        <h4 className="font-semibold text-xl my-3">{item.name}</h4>
         <strong className="text-accent">{formatCurrency(item.basePrice)}</strong>
       </div>
           <p className="text-gray-500 text-sm line-clamp-3">{item.description }</p>

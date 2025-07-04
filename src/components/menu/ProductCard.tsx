@@ -2,8 +2,9 @@ import Image from "next/image";
 import React from "react";
 import { formatCurrency } from "@/lib/formatCurrency";
 import AddToCartModel from "./AddToCartModel";
+import { TProductWithRelations } from "@/types/product";
 
-const ProductCard = () => {
+const ProductCard = ({item}:{item:TProductWithRelations}) => {
   return (
     <li
       className="p-6 rounded-lg text-center bg-[#f1f4f5]
@@ -11,24 +12,19 @@ const ProductCard = () => {
     >
       <div className="relative w-48 h-48 mx-auto">
         <Image
-          src={"/images/pizza.png"}
+          src={item.image}
           className="object-cover"
-          alt={"item.name"}
+          alt={item.name}
           fill
         />
       </div>
       <div className="flex items-center justify-between mb-4">
         <h4 className="font-semibold text-xl my-3">Pizza</h4>
-        <strong className="text-accent">{formatCurrency(55.22)}</strong>
+        <strong className="text-accent">{formatCurrency(item.basePrice)}</strong>
       </div>
-      <p className="text-gray-500 text-sm line-clamp-3">Pizza description</p>
+          <p className="text-gray-500 text-sm line-clamp-3">{item.description }</p>
       <AddToCartModel
-        item={{
-          name: "Pizza",
-          image: "/images/pizza.png",
-          description: "Pizza description",
-          price: '55.22',
-        }}
+        item={item}
       />
     </li>
   );

@@ -14,8 +14,11 @@ import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "../ui/checkbox";
+import { TProductWithRelations } from "@/types/product";
+import { Extra, Size } from "@prisma/client";
+import { formatCurrency } from "@/lib/formatCurrency";
 
-function AddToCartModel({ item }: { item: { [key: string]: string } }) {
+function AddToCartModel({ item }: { item: TProductWithRelations }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -38,11 +41,11 @@ function AddToCartModel({ item }: { item: { [key: string]: string } }) {
         <div className="space-y-10">
           <div className="space-y-4 text-center">
             <Label htmlFor="pick-size">Pick your size</Label>
-            <PickSize />
+            <PickSize itemPrice={item.basePrice} sizes={item.sizes}/>
           </div>
           <div className="space-y-4 text-center">
             <Label htmlFor="add-extras">Any extras?</Label>
-            <Extras />
+            <Extras extras={item.extras}/>
           </div>
         </div>
         <DialogFooter>
@@ -57,42 +60,44 @@ function AddToCartModel({ item }: { item: { [key: string]: string } }) {
 
 export default AddToCartModel;
 
-function PickSize() {
+function PickSize({ sizes, itemPrice }: { sizes: Size[]; itemPrice: number }) {
   return (
-    <RadioGroup defaultValue="comfortable">
-      <div className="flex items-center cursor-pointer space-x-2 border border-gray-100 rounded-md p-4 bg-gray-50">
-        <RadioGroupItem
-          value={"small"}
-          className="text-primary border-primary"
-        />
-        <Label>Small</Label>
-      </div>
-      <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <RadioGroupItem
-          value={"Medium"}
-          className="text-primary border-primary"
-        />
-        <Label>Medium</Label>
-      </div>
-      <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <RadioGroupItem
-          value={"Large"}
-          className="text-primary border-primary"
-        />
-        <Label>Large</Label>
-      </div>
+    <RadioGroup defaultValue="SMALL">
+      {sizes.map((size) => (
+        <div
+          key={size.id}
+          className="flex items-center  space-x-2 border border-gray-100 rounded-md p-4 bg-gray-50"
+        >
+              <RadioGroupItem
+            id={size.id}
+            value={size.name}
+            className="text-primary border-primary cursor-pointer"
+          />
+          <Label htmlFor={size.id} className="cursor-pointer">
+            {size.name} {formatCurrency(size.price + itemPrice)}
+          </Label>
+        </div>
+      ))}
     </RadioGroup>
   );
 }
-function Extras() {
+function Extras({extras}:{extras:Extra[]}) {
   return (
     <div className="">
-      <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <Checkbox className="text-primary border-primary" />
-        <Label className="text-sm text-accent font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Cheese
-        </Label>
-      </div>
+      {extras.map((extra) => (
+        <div
+          key={extra.id}
+          className="flex items-center space-x-2 border border-gray-100 rounded-md p-4"
+        >
+          <Checkbox className="text-primary border-primary" id={extra.id} />
+          <Label
+            htmlFor={extra.id}
+            className="text-sm text-accent cursor-pointer font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {extra.name} {formatCurrency(extra.price)}{" "}
+          </Label>
+        </div>
+      ))}
     </div>
   );
 }

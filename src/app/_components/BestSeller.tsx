@@ -2,6 +2,7 @@ import MainHeading from "@/components/main-heading";
 import Menu from "@/components/menu";
 
 const BestSeller = () => {
+    
   return (
     <section>
       <div className="container mb-10">

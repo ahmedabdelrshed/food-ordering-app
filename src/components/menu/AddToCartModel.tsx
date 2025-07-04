@@ -61,15 +61,24 @@ function PickSize() {
   return (
     <RadioGroup defaultValue="comfortable">
       <div className="flex items-center cursor-pointer space-x-2 border border-gray-100 rounded-md p-4 bg-gray-50">
-        <RadioGroupItem value={"small"} />
+        <RadioGroupItem
+          value={"small"}
+          className="text-primary border-primary"
+        />
         <Label>Small</Label>
       </div>
       <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <RadioGroupItem value={"Medium"} />
+        <RadioGroupItem
+          value={"Medium"}
+          className="text-primary border-primary"
+        />
         <Label>Medium</Label>
       </div>
       <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <RadioGroupItem value={"Large"} />
+        <RadioGroupItem
+          value={"Large"}
+          className="text-primary border-primary"
+        />
         <Label>Large</Label>
       </div>
     </RadioGroup>
@@ -79,7 +88,7 @@ function Extras() {
   return (
     <div className="">
       <div className="flex items-center space-x-2 border border-gray-100 rounded-md p-4">
-        <Checkbox />
+        <Checkbox className="text-primary border-primary" />
         <Label className="text-sm text-accent font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Cheese
         </Label>

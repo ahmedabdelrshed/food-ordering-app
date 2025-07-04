@@ -1,9 +1,9 @@
 import MainHeading from "@/components/main-heading";
 import Menu from "@/components/menu";
-import { db } from "@/lib/prisma";
+import { getProductsBestSellers } from "@/server/db/products";
 
 const BestSeller = async () => {
-    const products = await db.product.findMany({include:{sizes:true,extras:true}})
+    const products = await getProductsBestSellers();
   return (
     <section>
       <div className="container mb-10">

@@ -1,30 +1,30 @@
 "use client";
-
 import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";
 import { Menu, XIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { Routes } from "@/lib/constants";
 import Link from "../Link/Link";
+import { Translations } from "@/types/translations";
 
-function Navbar() {
+function Navbar({ translations }: { translations: Translations }) {
   const [openMenu, setOpenMenu] = useState(false);
   const pathname = usePathname();
-
+    const { lang } = useParams();
   const links = [
     {
       id: crypto.randomUUID(),
-      title: "Menu",
+      title: translations.navbar.menu,
       href: Routes.MENU,
     },
     {
       id: crypto.randomUUID(),
-      title: "About",
+      title: translations.navbar.about,
       href: Routes.ABOUT,
     },
     {
       id: crypto.randomUUID(),
-      title: "Contact",
+      title: translations.navbar.contact,
       href: Routes.CONTACT,
     },
   ];
@@ -55,9 +55,9 @@ function Navbar() {
           <li key={link.id}>
             <Link
               onClick={() => setOpenMenu(false)}
-              href={`/${link.href}`}
+              href={`/${lang}/${link.href}`}
               className={`hover:text-primary duration-200 transition-colors font-semibold ${
-                pathname.startsWith(`/${link.href}`)
+                pathname.startsWith(`/${lang}/${link.href}`)
                   ? "text-primary"
                   : "text-accent"
               }`}
@@ -67,12 +67,12 @@ function Navbar() {
           </li>
         ))}
         <Link
-          href={`/${Routes.AUTH}`}
+          href={`/${lang}/${Routes.AUTH}`}
           className={`${buttonVariants({
             size: "lg",
           })} !px-8 !rounded-full !font-bold `}
         >
-          Login
+          {translations.navbar.login}
         </Link>
       </ul>
     </nav>

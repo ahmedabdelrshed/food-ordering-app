@@ -20,6 +20,7 @@ import { formatCurrency } from "@/lib/formatCurrency";
 import { useState } from "react";
 import { addItem, CartItem } from "@/store/features/cart/cartSlice";
 import { useAppDispatch } from "@/store/hooks";
+import { ShoppingCartIcon } from "lucide-react";
 
 function AddToCartModel({ item }: { item: TProductWithRelations }) {
     const [open, setOpen] = useState(false);
@@ -58,7 +59,7 @@ function AddToCartModel({ item }: { item: TProductWithRelations }) {
           size="lg"
           className="mt-4 text-white rounded-full !px-8"
         >
-          <span>Add To Cart</span>
+          <span className="flex items-center gap-2">Add To Cart <ShoppingCartIcon className=" " /></span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">

@@ -1,4 +1,5 @@
 import Link from "../Link/Link";
+import CartButton from "./CartButton";
 import Navbar from "./Navbar";
 
 const Header = () => {
@@ -8,7 +9,10 @@ const Header = () => {
         <Link href={`/`} className="text-primary font-semibold text-2xl">
           🍕 Pizza
         </Link>
-        <Navbar />
+        <div className="flex items-center gap-4">
+          <Navbar />
+          <CartButton />
+        </div>
       </div>
     </header>
   );

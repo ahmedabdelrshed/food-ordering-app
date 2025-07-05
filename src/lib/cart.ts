@@ -10,3 +10,7 @@ export const deliveryFee = 5;
 export const getSubTotal = (cart: CartItem[]) => {
     return cart.reduce((acc, item) => acc + item.price, 0);
 };
+
+export const getTotalAmount = (cart: CartItem[]) => {
+    return getSubTotal(cart) + deliveryFee;
+};

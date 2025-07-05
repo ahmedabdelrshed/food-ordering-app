@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Roboto} from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer";
+import ReduxProvider from "@/providers/ReduxProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
-  preload: true
+  preload: true,
 });
-
-
 
 export const metadata: Metadata = {
   title: "Food Ordering App",
@@ -25,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className}>
+        <ReduxProvider>
           <Header />
           {children}
           <Footer />
+        </ReduxProvider>
       </body>
     </html>
   );

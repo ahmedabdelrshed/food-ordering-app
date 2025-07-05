@@ -18,11 +18,16 @@ import { TProductWithRelations } from "@/types/product";
 import { Extra, Size } from "@prisma/client";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useState } from "react";
+import { addItem, CartItem } from "@/store/features/cart/cartSlice";
+import { useAppDispatch } from "@/store/hooks";
 
 function AddToCartModel({ item }: { item: TProductWithRelations }) {
+    const [open, setOpen] = useState(false);
+
   const [selectedSize, setSelectedSize] = useState<Size>(item.sizes[0]);
   const [selectedExtras, setSelectedExtras] = useState<Extra[]>([]);
-  const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(1);
+    const dispatch = useAppDispatch();
   const totalPrice = () => {
     return (
       (item.basePrice +
@@ -32,20 +37,21 @@ function AddToCartModel({ item }: { item: TProductWithRelations }) {
     );
   };
   const onAddToCart = () => {
-    const product = {
-      id: item.id,
+    const product: CartItem = {
+      productId: item.id,
       name: item.name,
       image: item.image,
-      description: item.description,
-      basePrice: item.basePrice,
+      price: totalPrice(),
       extras: selectedExtras,
-      size: selectedSize,
+      size: selectedSize.name,
       quantity,
-    };
-    console.log(product);
+      sizeId: selectedSize.id,
+      };
+      dispatch(addItem(product));
+      setOpen(false);
   };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           type="button"

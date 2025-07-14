@@ -3,7 +3,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";
 import { Menu, XIcon } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
-import { Routes } from "@/lib/constants";
+import { Pages, Routes } from "@/lib/constants";
 import Link from "../Link/Link";
 import { Translations } from "@/types/translations";
 
@@ -67,7 +67,7 @@ function Navbar({ translations }: { translations: Translations }) {
           </li>
         ))}
         <Link
-          href={`/${lang}/${Routes.AUTH}`}
+          href={`/${lang}/${Routes.AUTH}/${Pages.LOGIN}`}
           className={`${buttonVariants({
             size: "lg",
           })} !px-8 !rounded-full !font-bold `}

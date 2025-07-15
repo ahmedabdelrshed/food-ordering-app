@@ -1,10 +1,11 @@
 import { IFormField } from "@/types/app";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { ValidationErrors } from "@/validations/auth";
 // import { ValidationErrors } from "@/validations/auth";
 
 interface Props extends IFormField {
-  error: [];
+  error: ValidationErrors;
 }
 
 const TextField = ({
@@ -33,7 +34,7 @@ const TextField = ({
         defaultValue={defaultValue}
         readOnly={readOnly}
       />
-      {/* {error && error[name] && (
+      {error && error[name] && (
         <p
           className={`text-accent mt-2 text-sm font-medium ${
             error[name] ? "text-destructive" : ""
@@ -41,7 +42,7 @@ const TextField = ({
         >
           {error[name]}
         </p>
-      )} */}
+      )}
     </div>
   );
 };

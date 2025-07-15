@@ -1,11 +1,11 @@
 import TextField from "./text-field";
 import PasswordField from "./password-field";
 import { IFormField } from "@/types/app";
-// import { ValidationErrors } from "@/validations/auth";
 import { InputTypes } from "@/lib/constants";
+import { ValidationErrors } from "@/validations/auth";
 
 interface Props extends IFormField {
-  error:[];
+  error:ValidationErrors;
 }
 
 const FormFields = (props: Props) => {

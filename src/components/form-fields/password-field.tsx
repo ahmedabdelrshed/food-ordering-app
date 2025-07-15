@@ -3,12 +3,12 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-// import { ValidationErrors } from "@/validations/auth";
 import { useParams } from "next/navigation";
 import { Languages } from "@/lib/constants";
+import { ValidationErrors } from "@/validations/auth";
 
 interface Props extends IFormField {
-  error: [];
+  error: ValidationErrors;
 }
 interface IState {
   showPassword: boolean;
@@ -27,7 +27,7 @@ const PasswordField = ({
 }: Props) => {
   const [state, setState] = useState(INITIAL_STATE);
   const { showPassword } = state;
-  const { locale } = useParams();
+  const { lang } = useParams();
   const handleClickShowPassword = () =>
     setState((prevState) => ({
       ...prevState,
@@ -62,7 +62,7 @@ const PasswordField = ({
           onClick={handleClickShowPassword}
           onMouseDown={handleMouseDownPassword}
           className={`absolute cursor-pointer ${
-            locale === Languages.ARABIC ? "left-3" : "right-3"
+            lang === Languages.ARABIC ? "left-3" : "right-3"
           }`}
         >
           {showPassword ? (
@@ -72,7 +72,7 @@ const PasswordField = ({
           )}
         </button>
       </div>
-      {/* {error && error[name] && (
+      {error && error[name] && (
         <p
           className={`text-accent mt-2 text-sm font-medium ${
             error[name] ? "text-destructive" : ""
@@ -80,7 +80,7 @@ const PasswordField = ({
         >
           {error[name]}
         </p>
-      )} */}
+      )}
     </div>
   );
 };

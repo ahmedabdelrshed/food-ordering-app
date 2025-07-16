@@ -11,7 +11,7 @@ const useFormFields = ({ slug, translations }: IProps) => {
         {
             label: translations.auth.login.email.label,
             name: "email",
-            type: "email",
+            type: "text",
             placeholder: translations.auth.login.email.placeholder,
             autoFocus: true,
         },

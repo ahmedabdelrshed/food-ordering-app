@@ -22,10 +22,39 @@ const useFormFields = ({ slug, translations }: IProps) => {
             type: "password",
         },
     ]
+    const registerFields = (): IFormField[] => [
+        {
+            label: translations.auth.register.name.label,
+            name: "name",
+            type: "text",
+            placeholder: translations.auth.register.name.placeholder,
+            autoFocus: true,
+        },
+        {
+            label: translations.auth.register.email.label,
+            name: "email",
+            type: "text",
+            placeholder: translations.auth.register.email.placeholder,
+        },
+        {
+            label: translations.auth.register.password.label,
+            name: "password",
+            placeholder: translations.auth.register.password.placeholder,
+            type: "password",
+        },
+        {
+            label: translations.auth.register.confirmPassword.label,
+            name: "confirmPassword",
+            placeholder: translations.auth.register.confirmPassword.placeholder,
+            type: "password",
+        },
+    ]
     const getFormFields = ():IFormField[] => {
         switch (slug) {
             case Pages.LOGIN:
                 return loginFields()
+            case Pages.Register:
+                return registerFields()
             default:
                 return []
         }

@@ -1,9 +1,10 @@
 "use server"
 
 import { Locale } from "@/i18n.config"
+import { getCurrentLang } from "@/lib/getCurrentLang"
 import { db } from "@/lib/prisma"
 import getTrans from "@/lib/translation"
-import { loginSchema } from "@/validations/auth"
+import { loginSchema, registerSchema } from "@/validations/auth"
 import bcrypt from "bcrypt"
 export const login = async (credentials: Record<"email" | "password", string> | undefined, locale: Locale) => {
     const translations = await getTrans(locale);
@@ -47,5 +48,37 @@ export const login = async (credentials: Record<"email" | "password", string> | 
             message: translations.messages.unexpectedError,
             statusCode: 500
         }
+    }
+}
+
+
+
+export const signUp = async(_prevState: unknown, formData: FormData) => {
+    const locale = await getCurrentLang();
+    const translations = await getTrans(locale);
+    const result = registerSchema(translations).safeParse(
+        Object.fromEntries(formData.entries())
+    );
+    if (!result.success) {
+        return {
+            error: result.error.flatten().fieldErrors,
+            formData
+        }
+    }
+    try {
+        const user = await db.user.findUnique({
+            where: {
+                email: result.data.email,
+            },
+        });
+        if (user) {
+            return {
+                status: 409,
+                message: translations.messages.userAlreadyExists,
+                formData,
+            };
+          }
+    } catch (error) {
+        
     }
 }

@@ -7,6 +7,7 @@ import ReduxProvider from "@/providers/ReduxProvider";
 import { Locale } from "@/i18n.config";
 import { Directions, Languages } from "@/lib/constants";
 import { Toaster } from "react-hot-toast";
+import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -44,10 +45,12 @@ export default async function RootLayout({
         }
       >
         <ReduxProvider>
-          <Header />
-          {children}
-          <Footer />
-          <Toaster />
+          <NextAuthSessionProvider>
+            <Header />
+            {children}
+            <Footer />
+            <Toaster />
+          </NextAuthSessionProvider>
         </ReduxProvider>
       </body>
     </html>

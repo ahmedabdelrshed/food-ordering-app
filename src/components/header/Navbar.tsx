@@ -1,16 +1,16 @@
 "use client";
-import { Button, buttonVariants } from "../ui/button";
+import { Button } from "../ui/button";
 import { useState } from "react";
 import { Menu, XIcon } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
-import { Pages, Routes } from "@/lib/constants";
+import {  Routes } from "@/lib/constants";
 import Link from "../Link/Link";
 import { Translations } from "@/types/translations";
 
 function Navbar({ translations }: { translations: Translations }) {
   const [openMenu, setOpenMenu] = useState(false);
   const pathname = usePathname();
-    const { lang } = useParams();
+  const { lang } = useParams();
   const links = [
     {
       id: crypto.randomUUID(),
@@ -66,14 +66,6 @@ function Navbar({ translations }: { translations: Translations }) {
             </Link>
           </li>
         ))}
-        <Link
-          href={`/${lang}/${Routes.AUTH}/${Pages.LOGIN}`}
-          className={`${buttonVariants({
-            size: "lg",
-          })} !px-8 !rounded-full !font-bold `}
-        >
-          {translations.navbar.login}
-        </Link>
       </ul>
     </nav>
   );

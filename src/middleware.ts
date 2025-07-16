@@ -23,7 +23,7 @@ function getLocale(request: NextRequest): string | undefined {
     return locale;
 }
 
-export default withAuth( async function middleware(request: NextRequest) {
+export default withAuth(async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-url", request.url);
 
@@ -40,17 +40,24 @@ export default withAuth( async function middleware(request: NextRequest) {
     }
     const currentLocale = request.url.split("/")[3] as Locale;
     const isAuth = await getToken({ req: request });
-    // const isAuthPage = pathname.startsWith(`/${currentLocale}/${Routes.AUTH}`);
+    const isAuthPage = pathname.startsWith(`/${currentLocale}/${Routes.AUTH}`);
     const protectedRoutes = [Routes.PROFILE, Routes.ADMIN];
     const isProtectedRoute = protectedRoutes.some((route) =>
         pathname.startsWith(`/${currentLocale}/${route}`)
     );
     // if user not logged in and try to access protected route
     if (!isAuth && isProtectedRoute) {
+        console.log('auth')
         return NextResponse.redirect(
             new URL(`/${currentLocale}/${Routes.AUTH}/${Pages.LOGIN}`, request.url)
         );
       }
+    // if user logged in and try to access auth page
+    if (isAuth && isAuthPage) {
+        return NextResponse.redirect(
+            new URL(`/${currentLocale}/${Routes.PROFILE}`, request.url)
+        );
+    }
 
     return NextResponse.next({
         request: {
@@ -58,6 +65,12 @@ export default withAuth( async function middleware(request: NextRequest) {
         },
     });
 
+}, {
+    callbacks: {
+        authorized() {
+            return true;
+        },
+    }
 })
 
 

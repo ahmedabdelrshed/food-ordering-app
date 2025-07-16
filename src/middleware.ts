@@ -55,6 +55,12 @@ export default withAuth(async function middleware(request: NextRequest) {
     }
     // if user logged in and try to access auth page
     if (isAuth && isAuthPage) {
+        const role = isAuth.role;
+        if (role === UserRole.ADMIN) {
+            return NextResponse.redirect(
+                new URL(`/${currentLocale}/${Routes.ADMIN}`, request.url)
+            );
+        }
         return NextResponse.redirect(
             new URL(`/${currentLocale}/${Routes.PROFILE}`, request.url)
         );

@@ -77,8 +77,29 @@ export const signUp = async(_prevState: unknown, formData: FormData) => {
                 message: translations.messages.userAlreadyExists,
                 formData,
             };
-          }
+        }
+        const hashedPassword = await bcrypt.hash(result.data.password, 10);
+        const newUser = await db.user.create({
+            data: {
+                name: result.data.name,
+                email: result.data.email,
+                password: hashedPassword,
+            },
+        });
+        return {
+            status: 201,
+            message: translations.messages.accountCreated,
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+            },
+        };
     } catch (error) {
-        
+        console.log(error);
+        return {
+            status: 500,
+            message: translations.messages.unexpectedError,
+        };
     }
 }

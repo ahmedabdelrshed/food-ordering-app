@@ -18,7 +18,7 @@ const Header = async () => {
           🍕 {translations.logo}
         </Link>
         <div className="flex items-center gap-4">
-          <Navbar translations={translations} />
+          <Navbar translations={translations} initialSession={initialSession} />
           <AuthButtons
             translations={translations}
             initialSession={initialSession}

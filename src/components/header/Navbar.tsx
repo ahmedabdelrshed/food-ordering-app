@@ -3,11 +3,21 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Menu, XIcon } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
-import {  Routes } from "@/lib/constants";
+import { Routes } from "@/lib/constants";
 import Link from "../Link/Link";
 import { Translations } from "@/types/translations";
+import { Session } from "next-auth";
+import { useClientSession } from "@/hooks/useClientSession";
+import { UserRole } from "@prisma/client";
 
-function Navbar({ translations }: { translations: Translations }) {
+function Navbar({
+  translations,
+  initialSession,
+}: {
+  translations: Translations;
+  initialSession: Session | null;
+}) {
+  const session = useClientSession(initialSession);
   const [openMenu, setOpenMenu] = useState(false);
   const pathname = usePathname();
   const { lang } = useParams();
@@ -28,6 +38,7 @@ function Navbar({ translations }: { translations: Translations }) {
       href: Routes.CONTACT,
     },
   ];
+    const isAdmin = session.data?.user.role === UserRole.ADMIN;
   return (
     <nav className="order-last lg:order-none">
       <Button
@@ -66,6 +77,31 @@ function Navbar({ translations }: { translations: Translations }) {
             </Link>
           </li>
         ))}
+        {session.data?.user && (
+          <li>
+            <Link
+              href={
+                isAdmin
+                  ? `/${lang}/${Routes.ADMIN}`
+                  : `/${lang}/${Routes.PROFILE}`
+              }
+              onClick={() => setOpenMenu(false)}
+              className={`${
+                pathname.startsWith(
+                  isAdmin
+                    ? `/${lang}/${Routes.ADMIN}`
+                    : `/${lang}/${Routes.PROFILE}`
+                )
+                  ? "text-primary"
+                  : "text-accent"
+              } hover:text-primary duration-200 transition-colors font-semibold`}
+            >
+              {isAdmin
+                ? translations.navbar.admin
+                : translations.navbar.profile}
+            </Link>
+          </li>
+        )}
       </ul>
     </nav>
   );

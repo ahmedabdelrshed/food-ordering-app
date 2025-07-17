@@ -66,7 +66,7 @@ export default withAuth(async function middleware(request: NextRequest) {
         );
     }
 
-    // if user loggedin and he isn't admin and try to acess admin route
+    // if user logged in and he isn't admin and try to access admin route
     if (isAuth && pathname.startsWith(`/${currentLocale}/${Routes.ADMIN}`)) {
         const role = isAuth.role;
         if (role !== UserRole.ADMIN) {

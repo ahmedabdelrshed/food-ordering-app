@@ -29,6 +29,11 @@ export const authOptions: NextAuthOptions = {
                 session.user.email = token.email;
                 session.user.role = token.role;
                 session.user.image = token.image as string;
+                session.user.country = token.country as string;
+                session.user.city = token.city as string;
+                session.user.postalCode = token.postalCode as string;
+                session.user.streetAddress = token.streetAddress as string;
+                session.user.phone = token.phone as string;
             }
             return {
                 ...session,
@@ -57,6 +62,11 @@ export const authOptions: NextAuthOptions = {
                 email: dbUser.email,
                 role: dbUser.role,
                 image: dbUser.image,
+                city: dbUser.city,
+                country: dbUser.country,
+                phone: dbUser.phone,
+                postalCode: dbUser.postalCode,
+                streetAddress: dbUser.streetAddress,
             };
           },
     },

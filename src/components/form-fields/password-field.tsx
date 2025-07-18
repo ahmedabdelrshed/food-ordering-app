@@ -1,3 +1,4 @@
+"use client";
 import { IFormField } from "@/types/app";
 import { useState } from "react";
 import { Input } from "../ui/input";

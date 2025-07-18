@@ -1,5 +1,7 @@
+import UserForm from "@/components/UserForm/UserForm";
 import { Pages, Routes } from "@/lib/constants";
 import { getCurrentLang } from "@/lib/getCurrentLang";
+import getTrans from "@/lib/translation";
 import { authOptions } from "@/server/auth";
 import { UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth";
@@ -8,7 +10,7 @@ import { redirect } from "next/navigation";
 const ProfilePage =async () => {
   const session = await getServerSession(authOptions);
   const lang = await getCurrentLang();
-  // const translations = await getTrans(locale);
+  const translations = await getTrans(lang);
 
   if (!session) {
     redirect(`/${lang}/${Routes.AUTH}/${Pages.LOGIN}`);
@@ -17,8 +19,17 @@ const ProfilePage =async () => {
     redirect(`/${lang}/${Routes.ADMIN}`);
   }
   return (
-    <div>ProfilePage</div>
-  )
+    <main>
+      <section className="section-gap">
+        <div className="container">
+          <h1 className="text-primary text-center font-bold text-4xl italic mb-10">
+            {translations.profile.title}
+          </h1>
+          <UserForm translations={translations} user={session.user}/> 
+        </div>
+      </section>
+    </main>
+  );
 }
 
 export default ProfilePage

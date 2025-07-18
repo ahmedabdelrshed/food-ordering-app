@@ -7,11 +7,12 @@ import { Session } from "next-auth";
 import Image from "next/image";
 import FormFields from "../form-fields/form-fields";
 import { Button } from "../ui/button";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { CameraIcon } from "lucide-react";
 import { ValidationErrors } from "@/validations/auth";
 import { updateProfile } from "@/app/[lang]/profile/_actions/profile";
 import Loader from "../ui/Loader";
+import toast from "react-hot-toast";
 
 const UserForm = ({
   translations,
@@ -43,6 +44,14 @@ const UserForm = ({
     formData: null,
   };
   const [state, action, pending] = useActionState(updateProfile, initialState);
+  useEffect(() => {
+    if (state.status === 200) {
+      toast.success(`${state.message}`);
+    }
+    if (state.status === 401 || state.status === 500) {
+      toast.error(`${state.message}`);
+    }
+  }, [state.status, state.message]);
   return (
     <form action={action} className="flex flex-col md:flex-row gap-10">
       <div className="group relative w-[200px] h-[200px] overflow-hidden rounded-full mx-auto">
@@ -90,7 +99,7 @@ const UserForm = ({
             />
           </div>
         )} */}
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={pending}>
           {pending ? <Loader /> : translations.save}
         </Button>
       </div>

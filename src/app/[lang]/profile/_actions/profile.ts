@@ -1,8 +1,10 @@
 "use server";
+import { Pages, Routes } from "@/lib/constants";
 import { getCurrentLang } from "@/lib/getCurrentLang";
 import { db } from "@/lib/prisma";
 import getTrans from "@/lib/translation";
 import { updateProfileSchema } from "@/validations/profile";
+import { revalidatePath } from "next/cache";
 
 export const updateProfile = async (_prevState: unknown, formData: FormData) => {
     const locale = await getCurrentLang();
@@ -10,7 +12,6 @@ export const updateProfile = async (_prevState: unknown, formData: FormData) => 
     const result = updateProfileSchema(translations).safeParse(
         Object.fromEntries(formData.entries())
     );
-    console.log(result.data)
     if (!result.success) {
         return {
             error: result.error.flatten().fieldErrors,
@@ -44,6 +45,12 @@ export const updateProfile = async (_prevState: unknown, formData: FormData) => 
                 image: imageUrl ?? user.image,
             },
         });
+        revalidatePath(`/${locale}/${Routes.PROFILE}`);
+        revalidatePath(`/${locale}/${Routes.ADMIN}`);
+        revalidatePath(`/${locale}/${Routes.ADMIN}/${Pages.USERS}`);
+        revalidatePath(
+            `/${locale}/${Routes.ADMIN}/${Pages.USERS}/${user.id}/${Pages.EDIT}`
+        );
         return {
             status: 200,
             message: translations.messages.updateProfileSucess,

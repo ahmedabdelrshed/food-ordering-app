@@ -52,6 +52,11 @@ const UserForm = ({
       toast.error(`${state.message}`);
     }
   }, [state.status, state.message]);
+
+  useEffect(() => {
+    setSelectedImage(user.image as string);
+  }, [user.image]);
+
   return (
     <form action={action} className="flex flex-col md:flex-row gap-10">
       <div className="group relative w-[200px] h-[200px] overflow-hidden rounded-full mx-auto">
@@ -89,16 +94,7 @@ const UserForm = ({
             </div>
           );
         })}
-        {/* {session.data?.user.role === UserRole.ADMIN && (
-          <div className="flex items-center gap-2 my-4">
-            <Checkbox
-              name="admin"
-              checked={isAdmin}
-              onClick={() => setIsAdmin(!isAdmin)}
-              label="Admin"
-            />
-          </div>
-        )} */}
+
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? <Loader /> : translations.save}
         </Button>
@@ -108,6 +104,7 @@ const UserForm = ({
 };
 
 export default UserForm;
+
 const UploadImage = ({
   setSelectedImage,
 }: {

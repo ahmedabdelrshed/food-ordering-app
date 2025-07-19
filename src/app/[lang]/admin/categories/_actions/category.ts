@@ -82,3 +82,30 @@ export const updateCategory = async (
         };
     }
 };
+
+
+export const deleteCategory = async (id: string) => {
+    const locale = await getCurrentLang();
+    const translations = await getTrans(locale);
+
+    try {
+        await db.category.delete({
+            where: {
+                id,
+            },
+        });
+        revalidatePath(`/${locale}/${Routes.ADMIN}/${Pages.CATEGORIES}`);
+        revalidatePath(`/${locale}/${Routes.MENU}`);
+
+        return {
+            status: 200,
+            message: translations.messages.deleteCategorySucess,
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: 500,
+            message: translations.messages.unexpectedError,
+        };
+    }
+};

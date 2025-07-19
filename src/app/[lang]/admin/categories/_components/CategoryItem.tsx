@@ -1,9 +1,8 @@
 import { Category } from "@prisma/client";
 import getTrans from "@/lib/translation";
 import { getCurrentLang } from "@/lib/getCurrentLang";
-import { Button } from "@/components/ui/button";
-import {  Trash2 } from "lucide-react";
 import EditCategory from "./EditCategory";
+import DeleteCategory from "./DeleteCategory";
 
 async function CategoryItem({ category }: { category: Category }) {
   const locale = await getCurrentLang();
@@ -13,11 +12,7 @@ async function CategoryItem({ category }: { category: Category }) {
       <h3 className="text-black font-medium text-lg flex-1">{category.name}</h3>
       <div className="flex items-center gap-2">
         <EditCategory translations={translations} category={category} />
-        {/* <DeleteCategory id={category.id} /> */}
-       
-        <Button variant="secondary">
-          <Trash2 />
-        </Button>
+        <DeleteCategory id={category.id} />
       </div>
     </li>
   );

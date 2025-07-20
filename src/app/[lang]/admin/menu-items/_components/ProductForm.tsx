@@ -7,14 +7,22 @@ import { IFormField } from "@/types/app";
 import { Translations } from "@/types/translations";
 import ProductImage from "./ProductImage";
 import { useState } from "react";
+import { Category } from "@prisma/client";
+import SelectCategory from "./SelectCategory";
 
-const ProductForm = ({ translations }: { translations: Translations }) => {
+const ProductForm = ({
+  translations,
+  categories,
+}: {
+  translations: Translations;
+  categories: Category[];
+}) => {
   const { getFormFields } = useFormFields({
     slug: `${Routes.ADMIN}/${Pages.MENU_ITEMS}`,
     translations,
   });
-
   const [selectedImage, setSelectedImage] = useState<string>("");
+  const [categoryId, setCategoryId] = useState(categories[0].id);
   return (
     <form className="flex flex-col md:flex-row gap-10">
       <div>
@@ -36,6 +44,12 @@ const ProductForm = ({ translations }: { translations: Translations }) => {
             </div>
           );
         })}
+        <SelectCategory
+          categories={categories}
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+          translations={translations}
+        />
       </div>
     </form>
   );

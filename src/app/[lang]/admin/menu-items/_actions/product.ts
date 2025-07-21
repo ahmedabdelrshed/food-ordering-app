@@ -155,3 +155,29 @@ export const updateProduct = async (args: {
 
 
 }
+
+export const deleteProduct = async ( productId: string ) => {
+    const locale = await getCurrentLang();
+    const translations = await getTrans(locale);
+    try {
+        await db.product.delete({
+            where: { id: productId }
+        });
+        revalidatePath(`/${locale}/${Routes.MENU}`);
+        revalidatePath(`/${locale}/${Routes.ADMIN}/${Pages.MENU_ITEMS}`);
+        revalidatePath(
+            `/${locale}/${Routes.ADMIN}/${Pages.MENU_ITEMS}/${productId}/${Pages.EDIT}`
+        );
+        revalidatePath(`/${locale}`);
+        return {
+            status: 200,
+            message: translations.messages.deleteProductSucess,
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            status: 500,
+            message: translations.messages.unexpectedError,
+        };
+    }
+}

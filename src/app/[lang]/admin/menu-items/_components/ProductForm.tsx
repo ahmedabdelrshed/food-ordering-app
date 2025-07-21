@@ -17,7 +17,7 @@ import {
 import SelectCategory from "./SelectCategory";
 import ItemOptionGroup from "./ItemOptionGroup";
 import { ValidationErrors } from "@/validations/auth";
-import { addProduct } from "../_actions/product";
+import { addProduct, updateProduct } from "../_actions/product";
 import toast from "react-hot-toast";
 import { TProductWithRelations } from "@/types/product";
 import FormActions from "./FormActions";
@@ -62,17 +62,25 @@ const ProductForm = ({
   };
 
   const [state, action, pending] = useActionState(
-    addProduct.bind(null, { categoryId, options: { sizes, extras } }),
+    product
+      ? updateProduct.bind(null, {
+          productId: product.id,
+          options: { sizes, extras },
+        })
+      : addProduct.bind(null, { categoryId, options: { sizes, extras } }),
     initialState
   );
   useEffect(() => {
-    if (state.status === 201) {
+    if (state.status === 201 || state.status === 200) {
       toast.success(`${state.message}`);
-      setSelectedImage("");
-      setCategoryId(categories[0].id);
-      setSizes([]);
-      setExtras([]);
+      if(state.status === 201) {
+       setSelectedImage("");
+       setCategoryId(categories[0].id);
+       setSizes([]);
+       setExtras([]);
+      }
     }
+    
     if (state.status === 500) {
       toast.error(`${state.message}`);
     }
@@ -125,7 +133,11 @@ const ProductForm = ({
           name={translations.extrasIngredients}
           optionsNames={Object.keys(ExtraIngredients)}
         />
-        <FormActions  translations={translations} pending={pending} productId={product?.id}/>
+        <FormActions
+          translations={translations}
+          pending={pending}
+          productId={product?.id}
+        />
       </div>
     </form>
   );

@@ -37,3 +37,18 @@ export const getProducts = cache(
     ["products"],
     { revalidate: 3600 }
 )
+
+export const getProductById = cache(
+    (id: string) => {
+        const product = db.product.findUnique({
+            where: { id },
+            include: {
+                sizes: true,
+                extras: true,
+            },
+        });
+        return product;
+    },
+    ["productById" ],
+    { revalidate: 3600 }
+);

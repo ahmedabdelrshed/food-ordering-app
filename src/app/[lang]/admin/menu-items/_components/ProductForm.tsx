@@ -18,25 +18,37 @@ import SelectCategory from "./SelectCategory";
 import ItemOptionGroup from "./ItemOptionGroup";
 import { ValidationErrors } from "@/validations/auth";
 import { addProduct } from "../_actions/product";
-import { Button } from "@/components/ui/button";
-import { Loader } from "lucide-react";
 import toast from "react-hot-toast";
+import { TProductWithRelations } from "@/types/product";
+import FormActions from "./FormActions";
 
 const ProductForm = ({
   translations,
   categories,
+  product,
 }: {
   translations: Translations;
   categories: Category[];
+  product?: TProductWithRelations;
 }) => {
   const { getFormFields } = useFormFields({
     slug: `${Routes.ADMIN}/${Pages.MENU_ITEMS}`,
     translations,
   });
-  const [selectedImage, setSelectedImage] = useState<string>("");
-  const [categoryId, setCategoryId] = useState(categories[0].id);
-  const [sizes, setSizes] = useState<Partial<Size>[]>([]);
-  const [extras, setExtras] = useState<Partial<Extra>[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string>(
+    product?.image ?? ""
+  );
+  const [categoryId, setCategoryId] = useState(
+    product?.categoryId ?? categories[0].id
+  );
+  const [sizes, setSizes] = useState<Partial<Size>[]>(product?.sizes ?? []);
+  const [extras, setExtras] = useState<Partial<Extra>[]>(product?.extras ?? []);
+  const formData = new FormData();
+  Object.entries(product ?? {}).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && key !== "image") {
+      formData.append(key, value.toString());
+    }
+  });
   const initialState: {
     message?: string;
     error?: ValidationErrors;
@@ -55,13 +67,13 @@ const ProductForm = ({
   );
   useEffect(() => {
     if (state.status === 201) {
-        toast.success(`${state.message}`);
-        setSelectedImage('');
-        setCategoryId(categories[0].id);
-        setSizes([]);
-        setExtras([]);
+      toast.success(`${state.message}`);
+      setSelectedImage("");
+      setCategoryId(categories[0].id);
+      setSizes([]);
+      setExtras([]);
     }
-    if ( state.status === 500) {
+    if (state.status === 500) {
       toast.error(`${state.message}`);
     }
   }, [state.message, state.status, categories]);
@@ -80,12 +92,16 @@ const ProductForm = ({
         )}
       </div>
       <div className="flex-1">
-              {getFormFields().map((field: IFormField) => {
-             const fieldValue =
-               state.formData?.get(field.name);
+        {getFormFields().map((field: IFormField) => {
+          const fieldValue =
+            state.formData?.get(field.name) ?? formData.get(field.name);
           return (
             <div key={field.name} className="mb-3">
-              <FormFields {...field} error={state.error} defaultValue={fieldValue as string} />
+              <FormFields
+                {...field}
+                error={state.error}
+                defaultValue={fieldValue as string}
+              />
             </div>
           );
         })}
@@ -109,13 +125,7 @@ const ProductForm = ({
           name={translations.extrasIngredients}
           optionsNames={Object.keys(ExtraIngredients)}
         />
-        <Button
-          type="submit"
-          disabled={pending}
-          className="w-full cursor-pointer mt-4"
-        >
-          {pending ? <Loader /> : translations.create}
-        </Button>
+        <FormActions  translations={translations} pending={pending} productId={product?.id}/>
       </div>
     </form>
   );

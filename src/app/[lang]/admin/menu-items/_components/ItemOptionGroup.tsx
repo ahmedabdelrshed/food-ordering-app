@@ -13,7 +13,7 @@ export type Props<T extends OptionType> = {
   setState: React.Dispatch<React.SetStateAction<Partial<T>[]>>;
   translations: Translations;
   optionsNames: string[];
-  name?: string;
+  name: string;
 };
 const ItemOptionGroup = <T extends OptionType>({
   state,
@@ -38,6 +38,7 @@ const ItemOptionGroup = <T extends OptionType>({
             setState={setState}
             translations={translations}
             optionsNames={optionsNames}
+            name={name}
           />
         </AccordionContent>
       </AccordionItem>

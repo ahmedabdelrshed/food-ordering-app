@@ -30,23 +30,25 @@ function AddToCartModel({ item }: { item: TProductWithRelations }) {
     const [quantity, setQuantity] = useState(1);
     const dispatch = useAppDispatch();
   const totalPrice = () => {
+    const selectSizePrice = selectedSize ? selectedSize.price : 0;
     return (
       (item.basePrice +
-        selectedSize.price +
+        selectSizePrice  +
         selectedExtras.reduce((acc, extra) => acc + extra.price, 0)) *
       quantity
     );
   };
   const onAddToCart = () => {
+    console.log(item)
     const product: CartItem = {
       productId: item.id,
       name: item.name,
       image: item.image,
       price: totalPrice(),
       extras: selectedExtras,
-      size: selectedSize.name,
+      size: selectedSize ? selectedSize.name : "",
       quantity,
-      sizeId: selectedSize.id,
+      sizeId: selectedSize ? selectedSize.id : "",
       };
       dispatch(addItem(product));
       setOpen(false);

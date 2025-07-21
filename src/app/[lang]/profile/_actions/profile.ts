@@ -1,6 +1,7 @@
 "use server";
 import { Pages, Routes } from "@/lib/constants";
 import { getCurrentLang } from "@/lib/getCurrentLang";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { db } from "@/lib/prisma";
 import getTrans from "@/lib/translation";
 import { updateProfileSchema } from "@/validations/profile";
@@ -21,7 +22,7 @@ export const updateProfile = async (_prevState: unknown, formData: FormData) => 
     const data = result.data;
     const imageFile = data.image as File;
     const imageUrl = Boolean(imageFile.size)
-        ? await getImageUrl(imageFile)
+        ? await getImageUrl(imageFile,"profile_images")
         : undefined;
     try {
         const user = await db.user.findUnique({
@@ -65,23 +66,3 @@ export const updateProfile = async (_prevState: unknown, formData: FormData) => 
 }
 
 
-const getImageUrl = async (imageFile: File) => {
-    const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("pathName", "profile_images");
-
-    try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`,
-            {
-                method: "POST",
-                body: formData,
-            }
-        );
-        const image = (await response.json()) as { url: string };
-        console.log(image)
-        return image.url;
-    } catch (error) {
-        console.error("Error uploading file to Cloudinary:", error);
-    }
-}

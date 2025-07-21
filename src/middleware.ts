@@ -92,8 +92,7 @@ export default withAuth(async function middleware(request: NextRequest) {
 
 
 export const config = {
-    // Matcher ignoring `/_next/`, `/api/`, ..etc
     matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+        "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|images).*)",
     ],
 };

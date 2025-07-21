@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/Loader";
 import { Translations } from "@/types/translations";
-import { Loader } from "lucide-react";
 
 interface IProps {
   translations: Translations;

@@ -55,12 +55,16 @@ const ProductForm = ({
   );
   useEffect(() => {
     if (state.status === 201) {
-      toast.success(`${state.message}`);
+        toast.success(`${state.message}`);
+        setSelectedImage('');
+        setCategoryId(categories[0].id);
+        setSizes([]);
+        setExtras([]);
     }
     if ( state.status === 500) {
       toast.error(`${state.message}`);
     }
-  }, [state.message, state.status]);
+  }, [state.message, state.status, categories]);
 
   return (
     <form action={action} className="flex flex-col md:flex-row gap-10">

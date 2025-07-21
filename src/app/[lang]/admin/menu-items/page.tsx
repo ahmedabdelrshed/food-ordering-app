@@ -8,19 +8,21 @@ import { UserRole } from "@prisma/client";
 import { ArrowRightCircle } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import MenuItems from "./_components/MenuItems";
+import { getProducts } from "@/server/db/products";
 
 const MenuItemsPage = async () => {
-    const locale = await getCurrentLang();
-    const translations = await getTrans(locale);
-    const session = await getServerSession(authOptions);
+  const locale = await getCurrentLang();
+  const translations = await getTrans(locale);
+  const session = await getServerSession(authOptions);
+  const products = await getProducts();
+  if (!session) {
+    redirect(`/${locale}/${Routes.AUTH}/${Pages.LOGIN}`);
+  }
 
-    if (!session) {
-      redirect(`/${locale}/${Routes.AUTH}/${Pages.LOGIN}`);
-    }
-
-    if (session && session.user.role !== UserRole.ADMIN) {
-      redirect(`/${locale}/${Routes.PROFILE}`);
-    }
+  if (session && session.user.role !== UserRole.ADMIN) {
+    redirect(`/${locale}/${Routes.PROFILE}`);
+  }
   return (
     <main>
       <section className="section-gap">
@@ -38,11 +40,11 @@ const MenuItemsPage = async () => {
               }`}
             />
           </Link>
-          {/* <MenuItems products={products} /> */}
+          <MenuItems products={products} />
         </div>
       </section>
     </main>
   );
-}
+};
 
-export default MenuItemsPage
+export default MenuItemsPage;

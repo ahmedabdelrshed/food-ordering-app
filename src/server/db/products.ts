@@ -24,3 +24,16 @@ export const getProductsByCategory = cache(
     ["products-by-category"],
     { revalidate: 3600 }
 );
+
+export const getProducts = cache(
+    () => {
+        const products = db.product.findMany({
+            orderBy: {
+                order: "asc",
+            },
+        });
+        return products;
+    },
+    ["products"],
+    { revalidate: 3600 }
+)

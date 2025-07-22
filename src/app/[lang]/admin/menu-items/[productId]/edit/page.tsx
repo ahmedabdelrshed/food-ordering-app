@@ -14,13 +14,14 @@ export async function generateStaticParams() {
 const EditProductPage = async ({
   params,
 }: {
-  params: Promise<{ productId: string }>;
+  params: { productId: string };
 }) => {
-  const { productId } = await params;
+  const { productId } = params;
   const locale = await getCurrentLang();
   const translations = await getTrans(locale);
   const categories = await getCategories();
   const product = await getProductById(productId);
+
   return (
     <main>
       <section>

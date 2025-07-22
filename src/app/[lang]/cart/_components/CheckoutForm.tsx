@@ -13,6 +13,23 @@ import { useAppSelector } from "@/store/hooks";
 function CheckoutForm() {
   const cart = useAppSelector(selectCartItems);
   const totalAmount = getTotalAmount(cart);
+  const handleCheckout = async () => {
+    const res = await fetch("/api/paymob/initiate-payment", {
+      method: "POST",
+      body: JSON.stringify({
+        amountCents: 10000, // يعني 100 جنيه
+        userEmail: "user@example.com",
+        userPhone: "+201234567890",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+    window.location.href = data.url; // هنوجه المستخدم لصفحة الدفع
+  };
+
   return (
     cart &&
     cart.length > 0 && (
@@ -77,7 +94,7 @@ function CheckoutForm() {
                 />
               </div>
             </div>
-            <Button className="h-10">Pay {formatCurrency(totalAmount)}</Button>
+            <Button type="button" onClick={handleCheckout} className="h-10">Pay {formatCurrency(totalAmount)}</Button>
           </div>
         </form>
       </div>

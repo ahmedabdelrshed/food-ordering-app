@@ -11,13 +11,14 @@ export async function generateStaticParams() {
   return products.map((product) => ({ productId: product.id }));
 }
 interface PageProps {
-  params: {
+  params: Promise<{
     productId: string;
-    lang: string; 
-  };
+    lang: string;
+  }>;
 }
+
 const EditProductPage = async ( {params} : PageProps) => {
-  const { productId } = params;
+  const { productId } =await params;
   const locale = await getCurrentLang();
   const translations = await getTrans(locale);
   const categories = await getCategories();

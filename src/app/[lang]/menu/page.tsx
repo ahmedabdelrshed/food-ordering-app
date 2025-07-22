@@ -1,31 +1,66 @@
+import Link from "@/components/Link/Link";
 import Menu from "@/components/menu";
-import { getProductsByCategory } from "@/server/db/products";
+import { buttonVariants } from "@/components/ui/button";
+import { getCurrentLang } from "@/lib/getCurrentLang";
+import { cn } from "@/lib/utils";
+import { getCategories } from "@/server/db/categories";
+import { getProductWithSearch } from "@/server/db/products";
 
-const MenuPage = async () => {
-    const categories = await getProductsByCategory();
-    
+type Props = {
+  searchParams?: {
+    categoryId?: string;
+    query?: string;
+  };
+};
+
+const MenuPage = async ({ searchParams }: Props) => {
+  const categoryId = searchParams?.categoryId ?? "";
+  const query = searchParams?.query ?? "";
+
+  const categories = await getCategories();
+  const products = await getProductWithSearch(categoryId, query);
+  const lang = await getCurrentLang();
+
   return (
-    <main>
-      {categories.length > 0 ? (
-        categories.map((category) => (
-          <section key={category.id} className="section-gap">
-            <div className="container text-center">
-              <h1 className="text-primary font-bold text-4xl italic mb-6">
-                {category.name}
-              </h1>
-              {category.products.length > 0 && (
-                  <Menu products={category.products} />
+    <main className="mt-10">
+      <ul className="flex items-center flex-wrap gap-4 justify-center">
+        <Link
+          href={`/${lang}/menu`}
+          className={cn(
+            buttonVariants({
+              variant: categoryId === "" ? "outline" : "default",
+            }),
+            "hover:!text-white"
+          )}
+        >
+          All
+        </Link>
+        {categories.map((category) => (
+          <li key={category.id}>
+            <Link
+              href={`/${lang}/menu?categoryId=${category.id}`}
+              className={cn(
+                buttonVariants({
+                  variant: category.id === categoryId ? "outline" : "default",
+                }),
+                "hover:!text-white"
               )}
-            </div>
-          </section>
-        ))
-      ) : (
-        <p className="text-accent text-center py-20">
-          No products found
-        </p>
-      )}
+            >
+              {category.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <div className="container my-10">
+        {products && products.length > 0 ? (
+          <Menu products={products} />
+        ) : (
+          <p className="text-center text-accent">No products found</p>
+        )}
+      </div>
     </main>
   );
-}
+};
 
-export default MenuPage
+export default MenuPage;

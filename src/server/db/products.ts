@@ -49,6 +49,51 @@ export const getProductById = cache(
         });
         return product;
     },
-    ["productById" ],
+    ["productById"],
     { revalidate: 3600 }
 );
+
+export const getProductWithSearch = async (categoryId: string, query: string) => {
+    let products
+    if (categoryId && query) {
+        products = await db.product.findMany({
+            where: {
+                categoryId,
+                AND: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                ],
+            }, include:{
+                sizes: true,
+                extras: true
+            }
+        })
+    }
+    else if (categoryId) {
+        products = await db.product.findMany({
+            where: {
+                categoryId
+            }, include: {
+                sizes: true,
+                extras: true
+            }
+        })
+    } else if (query) {
+        products = await db.product.findMany({
+            where: {
+                name: { contains: query, mode: 'insensitive' },
+                description: { contains: query, mode: 'insensitive' },
+            }, include: {
+                sizes: true,
+                extras: true
+            }
+        })
+    } else {
+        products = await db.product.findMany({
+            include: {
+                sizes: true,
+                extras: true
+        }})
+    }
+    return products;
+}

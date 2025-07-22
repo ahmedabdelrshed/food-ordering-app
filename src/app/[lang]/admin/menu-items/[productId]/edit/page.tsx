@@ -10,12 +10,13 @@ export async function generateStaticParams() {
 
   return products.map((product) => ({ productId: product.id }));
 }
-
-const EditProductPage = async ({
-  params,
-}: {
-  params: { productId: string };
-}) => {
+interface PageProps {
+  params: {
+    productId: string;
+    lang: string; 
+  };
+}
+const EditProductPage = async ( {params} : PageProps) => {
   const { productId } = params;
   const locale = await getCurrentLang();
   const translations = await getTrans(locale);

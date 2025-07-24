@@ -27,7 +27,7 @@ export const login = async (credentials: Record<"email" | "password", string> | 
                 message: translations.messages.userNotFound,
                 statusCode: 401
             }
-        const isPasswordValid = await bcrypt.compare(result.data.password, existingUser.password);
+        const isPasswordValid = await bcrypt.compare(result.data.password, existingUser.password as string);
         if (!isPasswordValid) {
             return {
                 message: translations.messages.incorrectPassword,

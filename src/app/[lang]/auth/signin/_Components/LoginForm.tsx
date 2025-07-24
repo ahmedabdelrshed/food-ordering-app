@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/Loader";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 const LoginForm = ({ translations }: { translations: Translations }) => {
   const { lang } = useParams();
@@ -56,6 +57,20 @@ const LoginForm = ({ translations }: { translations: Translations }) => {
         disabled={isLoading}
       >
         {isLoading ? <Loader /> : translations.auth.login.submit}
+      </Button>
+      <Button
+        type="button"
+        variant={"outline"}
+        className="w-full cursor-pointer hover:bg-white hover:text-black"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
+        Login with Google{" "}
+        <Image
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google Logo"
+          width="20"
+          height="20"
+        />
       </Button>
     </form>
   );

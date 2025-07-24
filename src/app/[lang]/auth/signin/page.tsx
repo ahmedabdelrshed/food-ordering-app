@@ -1,5 +1,5 @@
 import Link from "@/components/Link/Link";
-import { buttonVariants } from "@/components/ui/button";
+import {  buttonVariants } from "@/components/ui/button";
 import { Pages, Routes } from "@/lib/constants";
 import { getCurrentLang } from "@/lib/getCurrentLang";
 import getTrans from "@/lib/translation";
@@ -17,7 +17,7 @@ const SigninPage = async () => {
             <h2 className="text-2xl font-semibold text-center text-black mb-4">
               {translations.auth.login.title}
             </h2>
-            <LoginForm translations={translations}/>
+            <LoginForm translations={translations} />
             <p className="mt-2 flex items-center justify-center text-accent text-sm">
               <span>{translations.auth.login.authPrompt.message}</span>
               <Link

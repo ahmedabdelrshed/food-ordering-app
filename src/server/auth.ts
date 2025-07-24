@@ -7,6 +7,8 @@ import { login } from "./_actions/authActions";
 import { Locale } from "@/i18n.config";
 import { User, UserRole } from "@prisma/client";
 import { JWT } from "next-auth/jwt";
+import GoogleProvider from "next-auth/providers/google";
+
 declare module "next-auth" {
     interface Session extends DefaultSession {
         user: User;
@@ -77,7 +79,8 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET,
     debug: process.env.NODE_ENV === Environments.DEV,
-    providers: [Credentials({
+    providers: [
+        Credentials({
         name: "credentials",
         credentials: {
             email: { label: "Email", type: "email", placeholder: "Enter your email" },
@@ -95,7 +98,12 @@ export const authOptions: NextAuthOptions = {
                 throw new Error(JSON.stringify({ validationError: res.error, responseError: res.message, statusCode: res.statusCode }));
             }
         },
-    })],
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        })
+    ],
     adapter: PrismaAdapter(db),
     pages: {
         signIn: `/${Routes.AUTH}/${Pages.LOGIN}`

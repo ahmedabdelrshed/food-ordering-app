@@ -6,18 +6,15 @@ import { cn } from "@/lib/utils";
 import { getCategories } from "@/server/db/categories";
 import { getProductWithSearch } from "@/server/db/products";
 
-type Props = {
-  params: { lang: string };
-  searchParams?: {
-    categoryId?: string;
-    query?: string;
-  };
-};
 
-const MenuPage = async (props: Promise<Props>) => {
-  const { searchParams } = await props;
-  const categoryId = searchParams?.categoryId ?? "";
-  const query = searchParams?.query ?? "";
+const MenuPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ categoryId?: string;
+    query?: string; }>;
+}) => {
+  const categoryId = (await searchParams).categoryId ?? "";
+  const query = (await searchParams).query ?? "";
 
   const categories = await getCategories();
   const products = await getProductWithSearch(categoryId, query);

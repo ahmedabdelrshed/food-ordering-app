@@ -7,14 +7,15 @@ import { getCategories } from "@/server/db/categories";
 import { getProductWithSearch } from "@/server/db/products";
 
 type Props = {
-  params: { [key: string]: string };
+  params: { lang: string };
   searchParams?: {
     categoryId?: string;
     query?: string;
   };
 };
 
-const MenuPage = async ({ searchParams }: Props) => {
+const MenuPage = async (props: Props) => {
+  const { searchParams } = props;
   const categoryId = searchParams?.categoryId ?? "";
   const query = searchParams?.query ?? "";
 

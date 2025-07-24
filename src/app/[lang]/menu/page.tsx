@@ -7,6 +7,7 @@ import { getCategories } from "@/server/db/categories";
 import { getProductWithSearch } from "@/server/db/products";
 
 type Props = {
+  params: { [key: string]: string };
   searchParams?: {
     categoryId?: string;
     query?: string;

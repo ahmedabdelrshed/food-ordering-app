@@ -53,12 +53,17 @@ export const getProductById = cache(
     { revalidate: 3600 }
 );
 
-export const getProductWithSearch = async (categoryId: string, query: string) => {
+export const getProductWithSearch = async (categoryName: string, query: string) => {
     let products
-    if (categoryId && query) {
+    if (categoryName && query) {
         products = await db.product.findMany({
             where: {
-                categoryId,
+                category: {
+                    name: {
+                        contains: categoryName,
+                        mode: 'insensitive'
+                    }
+                },
                 AND: [
                     {
                         OR: [
@@ -74,10 +79,15 @@ export const getProductWithSearch = async (categoryId: string, query: string) =>
             }
         })
     }
-    else if (categoryId) {
+    else if (categoryName) {
         products = await db.product.findMany({
             where: {
-                categoryId
+                category: {
+                    name: {
+                        contains: categoryName,
+                        mode: 'insensitive'
+                    }
+               }
             }, include: {
                 sizes: true,
                 extras: true

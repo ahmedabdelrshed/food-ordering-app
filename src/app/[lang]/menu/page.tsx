@@ -7,27 +7,26 @@ import { getCategories } from "@/server/db/categories";
 import { getProductWithSearch } from "@/server/db/products";
 import SearchInput from "./_components/SearchInput";
 
-
 const MenuPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ categoryId?: string;
+  searchParams: Promise<{ category?: string;
     query?: string; }>;
 }) => {
-  const categoryId = (await searchParams).categoryId ?? "";
+  const categoryName = (await searchParams).category ?? "";
   const query = (await searchParams).query ?? "";
   const categories = await getCategories();
-  const products = await getProductWithSearch(categoryId, query);
+  const products = await getProductWithSearch(categoryName, query);
   const lang = await getCurrentLang();
   return (
     <main className="mt-10">
-      <SearchInput/>
+      <SearchInput />
       <ul className="flex items-center flex-wrap gap-4 justify-center">
         <Link
           href={`/${lang}/menu`}
           className={cn(
             buttonVariants({
-              variant: categoryId === "" ? "outline" : "default",
+              variant: categoryName === "" ? "outline" : "default",
             }),
             "hover:!text-white"
           )}
@@ -37,10 +36,11 @@ const MenuPage = async ({
         {categories.map((category) => (
           <li key={category.id}>
             <Link
-              href={`/${lang}/menu?categoryId=${category.id}`}
+              href={`/${lang}/menu?category=${category.name}`}
               className={cn(
                 buttonVariants({
-                  variant: category.id === categoryId ? "outline" : "default",
+                  variant:
+                    category.name === categoryName ? "outline" : "default",
                 }),
                 "hover:!text-white"
               )}
@@ -50,7 +50,6 @@ const MenuPage = async ({
           </li>
         ))}
       </ul>
-
       <div className="container my-10">
         {products && products.length > 0 ? (
           <Menu products={products} />

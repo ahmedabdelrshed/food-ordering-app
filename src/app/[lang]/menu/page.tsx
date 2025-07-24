@@ -14,8 +14,8 @@ type Props = {
   };
 };
 
-const MenuPage = async (props: Props) => {
-  const { searchParams } = props;
+const MenuPage = async (props: Promise<Props>) => {
+  const { searchParams } = await props;
   const categoryId = searchParams?.categoryId ?? "";
   const query = searchParams?.query ?? "";
 

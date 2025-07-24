@@ -15,6 +15,7 @@ const ProductCard = ({ item }: { item: TProductWithRelations }) => {
           src={item.image}
           className="object-cover"
           alt={item.name}
+          loading="lazy"
           fill
         />
       </div>

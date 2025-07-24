@@ -60,10 +60,15 @@ export const getProductWithSearch = async (categoryId: string, query: string) =>
             where: {
                 categoryId,
                 AND: [
-                    { name: { contains: query, mode: 'insensitive' } },
-                    { description: { contains: query, mode: 'insensitive' } },
-                ],
-            }, include:{
+                    {
+                        OR: [
+                            { name: { contains: query, mode: 'insensitive' } },
+                            { description: { contains: query, mode: 'insensitive' } }
+                        ]
+                    }
+                ]
+            },
+            include: {
                 sizes: true,
                 extras: true
             }
@@ -81,9 +86,12 @@ export const getProductWithSearch = async (categoryId: string, query: string) =>
     } else if (query) {
         products = await db.product.findMany({
             where: {
-                name: { contains: query, mode: 'insensitive' },
-                description: { contains: query, mode: 'insensitive' },
-            }, include: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                ]
+            },
+            include: {
                 sizes: true,
                 extras: true
             }

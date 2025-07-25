@@ -8,28 +8,45 @@ import { getTotalAmount } from "@/lib/cart";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { selectCartItems } from "@/store/features/cart/cartSlice";
 import { useAppSelector } from "@/store/hooks";
+import { loadStripe } from "@stripe/stripe-js";
+
+ loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 
 
 function CheckoutForm() {
   const cart = useAppSelector(selectCartItems);
   const totalAmount = getTotalAmount(cart);
-  const handleCheckout = async () => {
-    const res = await fetch("/api/paymob/initiate-payment", {
-      method: "POST",
-      body: JSON.stringify({
-        amountCents: 10000, // يعني 100 جنيه
-        userEmail: "user@example.com",
-        userPhone: "+201234567890",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+ 
+  //   const res = await fetch("/api/paymob/initiate-payment", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       amountCents: 10000, // يعني 100 جنيه
+  //       userEmail: "user@example.com",
+  //       userPhone: "+201234567890",
+  //     }),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
 
-    const data = await res.json();
-    window.location.href = data.url; // هنوجه المستخدم لصفحة الدفع
-  };
+  //   const data = await res.json();
+  //   window.location.href = data.url; // هنوجه المستخدم لصفحة الدفع
+  // };
+ const handleClick = async () => {
+   const res = await fetch("/api/checkout", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ items:cart }),
+   });
 
+   const data = await res.json();
+   console.log(data)
+   if (data.url) {
+     window.location.href = data.url;
+   }
+ };
   return (
     cart &&
     cart.length > 0 && (
@@ -94,7 +111,7 @@ function CheckoutForm() {
                 />
               </div>
             </div>
-            <Button type="button" onClick={handleCheckout} className="h-10">Pay {formatCurrency(totalAmount)}</Button>
+            <Button type="button" onClick={handleClick} className="h-10">Pay {formatCurrency(totalAmount)}</Button>
           </div>
         </form>
       </div>

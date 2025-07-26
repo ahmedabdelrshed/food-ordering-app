@@ -29,7 +29,6 @@ const cartSlice = createSlice({
             const existingItem = state.items.find((item) => item.productId === action.payload.productId &&
                 item.sizeId === action.payload.sizeId
                 && item.extras.map((extra) => extra.name).join(',') === action.payload.extras.map((extra) => extra.name).join(','));
-            console.log(existingItem)
             if (existingItem) {
                 existingItem.quantity += action.payload.quantity;
                 existingItem.price += action.payload.price;

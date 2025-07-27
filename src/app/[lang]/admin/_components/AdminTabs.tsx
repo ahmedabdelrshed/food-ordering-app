@@ -26,11 +26,11 @@ function AdminTabs({ translations }: { translations: Translations }) {
       title: translations.admin.tabs.menuItems,
       href: `${Routes.ADMIN}/${Pages.MENU_ITEMS}`,
     },
-    {
-      id: crypto.randomUUID(),
-      title: translations.admin.tabs.users,
-      href: `${Routes.ADMIN}/${Pages.USERS}`,
-    },
+    // {
+    //   id: crypto.randomUUID(),
+    //   title: translations.admin.tabs.users,
+    //   href: `${Routes.ADMIN}/${Pages.USERS}`,
+    // },
     {
       id: crypto.randomUUID(),
       title: translations.admin.tabs.orders,

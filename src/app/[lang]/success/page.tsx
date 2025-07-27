@@ -1,10 +1,18 @@
+"use client";
 import { CheckCheckIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/store/hooks";
+import { clearCart } from "@/store/features/cart/cartSlice";
 
 export default function OrderSuccess() {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(clearCart());
+  },[dispatch]);
   return (
     <div className=" text-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-gray-100 p-8 rounded-lg shadow-lg border-2">

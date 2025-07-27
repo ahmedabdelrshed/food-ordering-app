@@ -18,6 +18,7 @@ export const checkoutAction = async (args: { session: Session, items: CartItem[]
         }
     }
     try {
+        console.log(process.env.NEXT_PUBLIC_BASE_URL)
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/checkout`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

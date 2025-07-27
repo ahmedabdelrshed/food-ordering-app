@@ -10,32 +10,39 @@ export async function POST(req: Request) {
     const body = await req.json();
     try {
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'], 
-            mode: 'payment', // عملية دفع لمرة واحدة
+            payment_method_types: ['card'],
+            mode: 'payment',
             line_items: [...body.items.map((item: CartItem) => ({
                 price_data: {
                     currency: 'usd',
                     product_data: {
                         name: item.name,
                         images: [item.image],
+                        metadata: {
+                            productId: item.productId,
+                            size: item.size,
+                            sizeId: item.sizeId,
+                            extras: JSON.stringify(item.extras),
+                            price: item.price.toString(),
+                        }
                     },
                     unit_amount: (item.price / item.quantity) * 100, // السعر بالسنت (مثلاً 2000 = 20 دولار)
                 },
                 quantity: item.quantity,
             })), {
-                    price_data: {
-                        currency: 'usd',
-                        product_data: {
-                            name: 'Delivery Fee',
-                        },
-                        unit_amount: 500, // 5 دولار × 100 = 500 سنت
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: 'Delivery Fee',
                     },
-                    quantity: 1,
-                }],
+                    unit_amount: 500, // 5 دولار × 100 = 500 سنت
+                },
+                quantity: 1,
+            }],
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
             metadata: {
-                ...body.user, 
+                ...body.user,
             }
         });
 

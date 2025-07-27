@@ -116,7 +116,35 @@ const useFormFields = ({ slug, translations }: IProps) => {
             placeholder: translations.admin["menu-items"].form.basePrice.placeholder,
         },
     ];
-    const getFormFields = ():IFormField[] => {
+    const checkoutFormFields = (): IFormField[] => [
+        {
+            label: translations.profile.form.phone.label,
+            name: "phone",
+            type: "text",
+            placeholder: translations.profile.form.phone.placeholder,
+        },
+        {
+            label: translations.profile.form.address.label,
+            name: "streetAddress",
+            type: "text",
+            placeholder: translations.profile.form.address.placeholder,
+
+        },
+        {
+            label: translations.profile.form.postalCode.label,
+            name: "postalCode",
+            type: "text",
+            placeholder: translations.profile.form.postalCode.placeholder,
+        },
+        {
+            label: translations.profile.form.city.label,
+            name: "city",
+            type: "text",
+            placeholder: translations.profile.form.city.placeholder,
+        },
+    ];
+
+    const getFormFields = (): IFormField[] => {
         switch (slug) {
             case Pages.LOGIN:
                 return loginFields()
@@ -126,6 +154,8 @@ const useFormFields = ({ slug, translations }: IProps) => {
                 return profileFields()
             case `${Routes.ADMIN}/${Pages.MENU_ITEMS}`:
                 return addProductFields();
+            case 'checkout':
+                return checkoutFormFields();
             default:
                 return []
         }

@@ -15,7 +15,7 @@ export const addProduct = async (args: {
     const locale = await getCurrentLang();
     const translations = await getTrans(locale);
     const result = addProductSchema(translations).safeParse(
-        Object.fromEntries(formData.entries())
+        Object.fromEntries(formData.entries())      
     );
     if (result.success === false) {
         return {

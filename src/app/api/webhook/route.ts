@@ -45,25 +45,32 @@ export async function POST(req: NextRequest) {
                     price: (item.price?.unit_amount as number) / 100,
                 };
             }) || [];           
-             await db.order.create({
-                data: {
-                    user: { connect: { email: session.metadata?.email as string } },
+            await db.order.upsert({
+                where: { checkoutSessionId: session.id },
+                update: {}, // مفيش حاجة تحدثها لو موجود بالفعل
+                create: {
+                    city: session.metadata?.city as string,
+                    streetAddress: session.metadata?.streetAddress as string,
+                    phone: session.metadata?.phone  as string,
+                    user: { connect: { email: session.metadata?.email  } },
                     items: {
-                        create: itemsData?.map((item) => ({
+                        create: itemsData.map((item) => ({
                             product: { connect: { id: item.productId } },
                             size: { connect: { id: item.sizeId } },
                             quantity: item.quantity,
                             price: item.price,
                             extras: {
-                                connect: item.extras.map((extra:Extra) => ({
+                                connect: item.extras.map((extra: Extra) => ({
                                     id: extra.id
                                 }))
                             }
-                        })),
-                     },
-                    checkoutSessionId: session.id
+                        }))
+                    },
+                    checkoutSessionId: session.id,
+                   
                 }
             });
+
         }
         return new Response('تم الاستلام', { status: 200 });
 

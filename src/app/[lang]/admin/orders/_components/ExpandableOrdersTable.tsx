@@ -3,9 +3,15 @@ import { formatCurrency, formatDate } from "@/lib/formatCurrency";
 import { supabase } from "@/lib/supabase";
 import { getOrders } from "@/server/db/orders";
 import { OrderItem } from "@prisma/client";
-import { ChevronDownIcon, ChevronsUpIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronsUpIcon,
+  MapPinIcon,
+  PhoneIcon,
+} from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+
 interface OrdersTableProps {
   initialOrders: Awaited<ReturnType<typeof getOrders>>;
 }
@@ -23,6 +29,7 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
     }
     setExpandedOrders(newExpanded);
   };
+
   useEffect(() => {
     const channel = supabase
       .channel("orders-updates")
@@ -33,11 +40,9 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
           schema: "public",
           table: "Order",
         },
-        async(payload) => {
-          console.log("📦 New Order:", payload.new);
+        async () => {
           const res = await fetch("/api/orders");
           const allOrders = await res.json();
-          console.log(allOrders)
           setOrders(allOrders);
         }
       )
@@ -51,6 +56,7 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
       supabase.removeChannel(channel);
     };
   }, []);
+
   const calculateItemTotal = (item: OrderItem) => {
     return item.price * item.quantity;
   };
@@ -73,6 +79,12 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Customer
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Delivery Address
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Phone
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Items Count
@@ -113,6 +125,25 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
                     {order.user.email}
                   </div>
                 </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center space-x-1">
+                    <MapPinIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm">
+                     
+                      <div className="text-gray-900">
+                        {order.city || "No city"}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center space-x-1">
+                    <PhoneIcon className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm text-gray-900">
+                      {order.phone || "No phone"}
+                    </span>
+                  </div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {order.items.length} item
@@ -132,77 +163,123 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
               {/* Expanded Order Items */}
               {expandedOrders.has(order.id) && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 bg-gray-50">
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-gray-900 mb-3">
-                        Order Items:
-                      </h4>
-                      {order.items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="bg-white p-4 rounded-lg border border-gray-200"
-                        >
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2">
-                                <Image
-                                  src={item.product.image}
-                                  alt={item.product.name}
-                                  width={48}
-                                  height={48}
-                                  className="w-12 h-12 rounded-lg object-cover"
-                                />
-                                <div>
-                                  <h5 className="text-sm font-medium text-gray-900">
-                                    {item.product.name}
-                                  </h5>
-                                  <p className="text-xs text-gray-500">
-                                    {item.product.description}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                <div>
-                                  <span className="font-medium">Size:</span>{" "}
-                                  {item.size.name}
-                                  <div className="text-gray-500">
-                                    {formatCurrency(
-                                      item.size.price + item.product.basePrice
-                                    )}{" "}
-                                    each
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <span className="font-medium">Quantity:</span>{" "}
-                                  {item.quantity}
-                                </div>
-
-                                {item.extras.length > 0 && (
-                                  <div>
-                                    <span className="font-medium">Extras:</span>
-                                    <ul className="text-gray-500 text-xs mt-1">
-                                      {item.extras.map((extra) => (
-                                        <li key={extra.id}>
-                                          {extra.name} (+
-                                          {formatCurrency(extra.price)})
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                              </div>
+                  <td colSpan={8} className="px-6 py-4 bg-gray-50">
+                    <div className="space-y-4">
+                      {/* Order Summary Section */}
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="text-sm font-medium text-gray-900 mb-3">
+                          Order Summary:
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">
+                              Customer:
+                            </span>
+                            <div className="text-gray-900">
+                              {order.user.name || "N/A"}
                             </div>
-
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-green-600">
-                                {formatCurrency(calculateItemTotal(item))}
-                              </div>
+                            <div className="text-gray-500">
+                              {order.user.email}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">
+                              Delivery Address:
+                            </span>
+                            <div className="text-gray-900">
+                              {order.streetAddress || "No address provided"}
+                            </div>
+                            <div className="text-gray-500">
+                              {order.city || "No city provided"}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">
+                              Contact:
+                            </span>
+                            <div className="text-gray-900">
+                              {order.phone || "No phone provided"}
                             </div>
                           </div>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Order Items Section */}
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Order Items:
+                        </h4>
+                        {order.items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="bg-white p-4 rounded-lg border border-gray-200"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-2">
+                                  <Image
+                                    src={item.product.image}
+                                    alt={item.product.name}
+                                    width={48}
+                                    height={48}
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-900">
+                                      {item.product.name}
+                                    </h5>
+                                    <p className="text-xs text-gray-500">
+                                      {item.product.description}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <span className="font-medium">Size:</span>{" "}
+                                    {item.size.name}
+                                    <div className="text-gray-500">
+                                      {formatCurrency(
+                                        item.size.price + item.product.basePrice
+                                      )}{" "}
+                                      each
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <span className="font-medium">
+                                      Quantity:
+                                    </span>{" "}
+                                    {item.quantity}
+                                  </div>
+
+                                  {item.extras.length > 0 && (
+                                    <div>
+                                      <span className="font-medium">
+                                        Extras:
+                                      </span>
+                                      <ul className="text-gray-500 text-xs mt-1">
+                                        {item.extras.map((extra) => (
+                                          <li key={extra.id}>
+                                            {extra.name} (+
+                                            {formatCurrency(extra.price)})
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-green-600">
+                                  {formatCurrency(calculateItemTotal(item))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </td>
                 </tr>

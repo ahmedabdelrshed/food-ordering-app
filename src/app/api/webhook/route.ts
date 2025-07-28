@@ -23,7 +23,12 @@ export async function POST(req: NextRequest) {
         );
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            console.log(session.metadata)
+            const existingOrder = await db.order.findUnique({
+                where: { checkoutSessionId: session.id },
+            });
+            if (existingOrder) {
+                return new Response('Order already exists', { status: 200 });
+            }
             const session_data = await stripe.checkout.sessions.retrieve(event.data.object.id, {
                 expand: ['line_items', 'line_items.data.price.product'],
             });
@@ -55,7 +60,8 @@ export async function POST(req: NextRequest) {
                                 }))
                             }
                         })),
-                    }
+                     },
+                    checkoutSessionId: session.id
                 }
             });
         }

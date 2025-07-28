@@ -1,16 +1,18 @@
 "use client";
 import { formatCurrency, formatDate } from "@/lib/formatCurrency";
+import { supabase } from "@/lib/supabase";
 import { getOrders } from "@/server/db/orders";
 import { OrderItem } from "@prisma/client";
 import { ChevronDownIcon, ChevronsUpIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 interface OrdersTableProps {
-  orders: Awaited<ReturnType<typeof getOrders>>;
+  initialOrders: Awaited<ReturnType<typeof getOrders>>;
 }
 
-export function ExpandableOrdersTable({ orders }: OrdersTableProps) {
+export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [orders, setOrders] = useState(initialOrders);
 
   const toggleOrder = (orderId: string) => {
     const newExpanded = new Set(expandedOrders);
@@ -21,12 +23,39 @@ export function ExpandableOrdersTable({ orders }: OrdersTableProps) {
     }
     setExpandedOrders(newExpanded);
   };
+  useEffect(() => {
+    const channel = supabase
+      .channel("orders-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Order",
+        },
+        async(payload) => {
+          console.log("📦 New Order:", payload.new);
+          const res = await fetch("/api/orders");
+          const allOrders = await res.json();
+          console.log(allOrders)
+          setOrders(allOrders);
+        }
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log("✅ Supabase listener is active.");
+        }
+      });
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   const calculateItemTotal = (item: OrderItem) => {
-    return (item.price ) * item.quantity;
+    return item.price * item.quantity;
   };
 
-  const calculateOrderTotal = (order: {items: OrderItem[]}) => {
+  const calculateOrderTotal = (order: { items: OrderItem[] }) => {
     return order.items.reduce(
       (sum: number, item: OrderItem) => sum + calculateItemTotal(item),
       0

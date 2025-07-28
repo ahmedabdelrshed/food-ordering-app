@@ -1,7 +1,6 @@
-import { cache } from "@/lib/cashe";
 import { db } from "@/lib/prisma";
 
-export const getOrders = cache(() => {
+export const getOrders = () => {
     const orders = db.order.findMany({
         include: {
             items: {
@@ -19,6 +18,4 @@ export const getOrders = cache(() => {
         }
     })
     return orders
-}, ['orders'], {
-    revalidate: 3600
-})
+}

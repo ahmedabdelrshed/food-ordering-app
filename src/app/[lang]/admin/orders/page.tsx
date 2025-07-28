@@ -1,5 +1,5 @@
 import { getOrders } from "@/server/db/orders";
-import { ExpandableOrdersTable } from "./_components/ExpandOrders";
+import { ExpandableOrdersTable } from "./_components/ExpandableOrdersTable";
 
 const OrdersPage = async () => {
   const orders = await getOrders();
@@ -15,7 +15,7 @@ const OrdersPage = async () => {
               View and manage all customer orders
             </p>
           </div>
-          <ExpandableOrdersTable orders={orders} />
+          <ExpandableOrdersTable initialOrders={orders} />
         </div>
       </section>
     </main>

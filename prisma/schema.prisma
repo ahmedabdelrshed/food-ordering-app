@@ -150,15 +150,22 @@ model OrderItem {
   updatedAt DateTime @updatedAt
 }
 
+enum OrderStatus {
+  WAITING
+  IN_DELIVERY
+  COMPLETED
+}
+
 model Order {
-  id        String      @id @default(cuid())
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  items     OrderItem[]
-  checkoutSessionId  String       @unique
-  city      String
-  streetAddress String
-  phone     String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  items             OrderItem[]
+  checkoutSessionId String      @unique
+  city              String
+  streetAddress     String
+  phone             String
+  status            OrderStatus @default(WAITING)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 }

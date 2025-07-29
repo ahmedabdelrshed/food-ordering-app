@@ -1,13 +1,17 @@
 "use client";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency, formatDate } from "@/lib/formatCurrency";
 import { supabase } from "@/lib/supabase";
 import { getOrders } from "@/server/db/orders";
-import { OrderItem } from "@prisma/client";
+import { OrderItem, OrderStatus } from "@prisma/client";
 import {
   ChevronDownIcon,
   ChevronsUpIcon,
   MapPinIcon,
   PhoneIcon,
+  ClockIcon,
+  TruckIcon,
+  CheckCircleIcon,
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -28,6 +32,29 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
       newExpanded.add(orderId);
     }
     setExpandedOrders(newExpanded);
+  };
+
+  const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+console.log(response)
+      if (response.ok) {
+        // Update local state
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+    }
   };
 
   useEffect(() => {
@@ -68,6 +95,65 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
     );
   };
 
+  const getStatusIcon = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.WAITING:
+        return <ClockIcon className="h-4 w-4" />;
+      case OrderStatus.IN_DELIVERY:
+        return <TruckIcon className="h-4 w-4" />;
+      case OrderStatus.COMPLETED:
+        return <CheckCircleIcon className="h-4 w-4" />;
+      default:
+        return <ClockIcon className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusBadge = (status: OrderStatus) => {
+    const baseClasses =
+      "inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-medium";
+
+    switch (status) {
+      case OrderStatus.WAITING:
+        return (
+          <span className={`${baseClasses} bg-yellow-100 text-yellow-800`}>
+            {getStatusIcon(status)}
+            <span>Waiting</span>
+          </span>
+        );
+      case OrderStatus.IN_DELIVERY:
+        return (
+          <span className={`${baseClasses} bg-blue-100 text-blue-800`}>
+            {getStatusIcon(status)}
+            <span>In Delivery</span>
+          </span>
+        );
+      case OrderStatus.COMPLETED:
+        return (
+          <span className={`${baseClasses} bg-green-100 text-green-800`}>
+            {getStatusIcon(status)}
+            <span>Completed</span>
+          </span>
+        );
+      default:
+        return (
+          <span className={`${baseClasses} bg-gray-100 text-gray-800`}>
+            {getStatusIcon(status)}
+            <span>Unknown</span>
+          </span>
+        );
+    }
+  };
+
+  const getStatusSelectOptions = () => {
+    const options = [
+      { value: OrderStatus.WAITING, label: "Waiting", disabled: false },
+      { value: OrderStatus.IN_DELIVERY, label: "In Delivery", disabled: false },
+      { value: OrderStatus.COMPLETED, label: "Completed", disabled: false },
+    ];
+
+    return options;
+  };
+
   return (
     <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
       <table className="min-w-full divide-y divide-gray-200">
@@ -87,6 +173,9 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
               Phone
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Items Count
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -101,23 +190,29 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
           {orders.map((order) => (
             <React.Fragment key={order.id}>
               {/* Main Order Row */}
-              <tr
-                className="hover:bg-gray-50 cursor-pointer"
-                onClick={() => toggleOrder(order.id)}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr className="hover:bg-gray-50">
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   {expandedOrders.has(order.id) ? (
                     <ChevronsUpIcon className="h-5 w-5 text-gray-400" />
                   ) : (
                     <ChevronDownIcon className="h-5 w-5 text-gray-400" />
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <div className="text-sm font-medium text-gray-900">
                     #{order.id.slice(-8)}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <div className="text-sm font-medium text-gray-900">
                     {order.user.name || "N/A"}
                   </div>
@@ -125,18 +220,23 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
                     {order.user.email}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td
+                  className="px-6 py-4 cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <div className="flex items-center space-x-1">
                     <MapPinIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
-                     
                       <div className="text-gray-900">
                         {order.city || "No city"}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <div className="flex items-center space-x-1">
                     <PhoneIcon className="h-4 w-4 text-gray-400" />
                     <span className="text-sm text-gray-900">
@@ -145,17 +245,58 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="space-y-2">
+                    {getStatusBadge(order.status)}
+                    <Select
+                      value={order.status}
+                      onValueChange={(value) =>
+                        updateOrderStatus(order.id, value as OrderStatus)
+                      }
+                    >
+                      <SelectTrigger
+                        className="block w-full text-xs border-gray-300 rounded-md "
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {getStatusSelectOptions().map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value}
+                              disabled={option.disabled}
+                              className="hover:!bg-primary hover:!text-white !text-accent !bg-transparent"
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </td>
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {order.items.length} item
                     {order.items.length !== 1 ? "s" : ""}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td
+                  className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   <div className="text-lg font-bold text-green-600">
                     {formatCurrency(calculateOrderTotal(order))}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td
+                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
+                  onClick={() => toggleOrder(order.id)}
+                >
                   {formatDate(order.createdAt)}
                 </td>
               </tr>
@@ -163,14 +304,14 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
               {/* Expanded Order Items */}
               {expandedOrders.has(order.id) && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-4 bg-gray-50">
+                  <td colSpan={9} className="px-6 py-4 bg-gray-50">
                     <div className="space-y-4">
                       {/* Order Summary Section */}
                       <div className="bg-white p-4 rounded-lg border border-gray-200">
                         <h4 className="text-sm font-medium text-gray-900 mb-3">
                           Order Summary:
                         </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                           <div>
                             <span className="font-medium text-gray-700">
                               Customer:
@@ -199,6 +340,14 @@ export function ExpandableOrdersTable({ initialOrders }: OrdersTableProps) {
                             </span>
                             <div className="text-gray-900">
                               {order.phone || "No phone provided"}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">
+                              Status:
+                            </span>
+                            <div className="mt-1">
+                              {getStatusBadge(order.status)}
                             </div>
                           </div>
                         </div>

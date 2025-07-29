@@ -8,6 +8,7 @@ import { Locale } from "@/i18n.config";
 import { Directions, Languages } from "@/lib/constants";
 import { Toaster } from "react-hot-toast";
 import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
+// import CustomerServiceChat from "./_components/CustomerServiceChat";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -50,6 +51,7 @@ export default async function RootLayout({
             {children}
             <Footer />
             <Toaster />
+            {/* <CustomerServiceChat customerId="dddddd"/> */}
           </NextAuthSessionProvider>
         </ReduxProvider>
       </body>

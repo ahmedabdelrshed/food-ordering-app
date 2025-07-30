@@ -2,8 +2,11 @@ import { getOrders } from "@/server/db/orders";
 import { ExpandableOrdersTable } from "./_components/ExpandableOrdersTable";
 
 const OrdersPage = async () => {
-  const orders = await getOrders();
-  return (
+const orders = await getOrders({
+  page: 1,
+  limit: 10,
+  search: "",
+});  return (
     <main>
       <section className="section-gap">
         <div className="container  mx-auto">
@@ -15,7 +18,7 @@ const OrdersPage = async () => {
               View and manage all customer orders
             </p>
           </div>
-          <ExpandableOrdersTable initialOrders={orders} />
+          <ExpandableOrdersTable initialData={orders} />
         </div>
       </section>
     </main>

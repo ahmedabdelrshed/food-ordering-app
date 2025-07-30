@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { PaginationProps } from "@/types/order";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import React from "react";
 
-export function Pagination({
+export const Pagination = React.memo(function Pagination({
   currentPage,
   totalPages,
   totalCount,
@@ -103,4 +104,4 @@ export function Pagination({
       </div>
     </div>
   );
-}
+})

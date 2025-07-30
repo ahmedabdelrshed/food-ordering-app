@@ -12,6 +12,7 @@ import { StatusBadge } from "./OrderStatus";
 import { StatusSelect } from "./StatusSelect";
 import { OrderSummary } from "./OrderSummary";
 import { OrderItems } from "./OrderItems";
+import React from "react";
 
 interface OrderRowProps {
   order: TOrderWithRelations;
@@ -31,7 +32,7 @@ function calculateOrderTotal(order: { items: OrderItem[] }) {
   );
 }
 
-export function OrderRow({
+export const OrderRow = React.memo(function OrderRow({
   order,
   isExpanded,
   onToggleExpand,
@@ -138,4 +139,4 @@ export function OrderRow({
       )}
     </>
   );
-}
+})

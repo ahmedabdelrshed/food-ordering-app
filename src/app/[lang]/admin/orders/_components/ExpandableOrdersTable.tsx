@@ -1,12 +1,11 @@
-// components/orders/ExpandableOrdersTable.tsx
 "use client";
 import React from "react";
-import { Loader2Icon } from "lucide-react";
 import { useOrdersTable } from "@/hooks/useOrdersTable";
 import { SearchAndFilters } from "./SearchAndFilters";
 import { OrderRow } from "./OrderRow";
 import { EmptyState } from "./EmptyState";
 import { Pagination } from "./Pagination";
+import { Loader2Icon } from "lucide-react";
 import { OrdersTableProps } from "@/types/order";
 
 export function ExpandableOrdersTable({ initialData }: OrdersTableProps) {
@@ -38,7 +37,6 @@ export function ExpandableOrdersTable({ initialData }: OrdersTableProps) {
         onClearSearch={clearSearch}
       />
 
-      {/* Table */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg relative">
         {loading && (
           <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">

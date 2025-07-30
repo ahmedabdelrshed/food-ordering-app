@@ -1,17 +1,18 @@
+import React from "react";
 import { TOrderWithRelations } from "@/types/order";
 import { OrderItem } from "@prisma/client";
 import { formatCurrency } from "@/lib/formatCurrency";
 import Image from "next/image";
 
-interface OrderItemsProps {
+export const OrderItems = React.memo(function OrderItems({
+  order,
+}: {
   order: TOrderWithRelations;
-}
-
-function calculateItemTotal(item: OrderItem) {
-  return item.price * item.quantity;
-}
-
-export function OrderItems({ order }: OrderItemsProps) {
+}) {
+  const calculateItemTotal = React.useCallback(
+    (item: OrderItem) => item.price * item.quantity,
+    []
+  );
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-medium text-gray-900">Order Items:</h4>
@@ -39,7 +40,6 @@ export function OrderItems({ order }: OrderItemsProps) {
                   </p>
                 </div>
               </div>
-
               <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="font-medium">Size:</span> {item.size.name}
@@ -48,11 +48,9 @@ export function OrderItems({ order }: OrderItemsProps) {
                     each
                   </div>
                 </div>
-
                 <div>
                   <span className="font-medium">Quantity:</span> {item.quantity}
                 </div>
-
                 {item.extras.length > 0 && (
                   <div>
                     <span className="font-medium">Extras:</span>
@@ -67,7 +65,6 @@ export function OrderItems({ order }: OrderItemsProps) {
                 )}
               </div>
             </div>
-
             <div className="text-right">
               <div className="text-lg font-bold text-green-600">
                 {formatCurrency(calculateItemTotal(item))}
@@ -78,4 +75,4 @@ export function OrderItems({ order }: OrderItemsProps) {
       ))}
     </div>
   );
-}
+});

@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/select";
 import { SearchIcon, XIcon, Loader2Icon } from "lucide-react";
 import { SearchAndFiltersProps } from "@/types/order";
+import React from "react";
 
-export function SearchAndFilters({
+export  const SearchAndFilters = React.memo (function SearchAndFilters({
   searchTerm,
   setSearchTerm,
   itemsPerPage,
@@ -105,4 +106,4 @@ export function SearchAndFilters({
       </div>
     </div>
   );
-}
+})

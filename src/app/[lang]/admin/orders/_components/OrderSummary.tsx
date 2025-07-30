@@ -1,11 +1,12 @@
+import React from "react";
 import { TOrderWithRelations } from "@/types/order";
 import { StatusBadge } from "./OrderStatus";
 
-interface OrderSummaryProps {
+export const OrderSummary = React.memo(function OrderSummary({
+  order,
+}: {
   order: TOrderWithRelations;
-}
-
-export function OrderSummary({ order }: OrderSummaryProps) {
+}) {
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200">
       <h4 className="text-sm font-medium text-gray-900 mb-3">Order Summary:</h4>
@@ -39,4 +40,4 @@ export function OrderSummary({ order }: OrderSummaryProps) {
       </div>
     </div>
   );
-}
+});

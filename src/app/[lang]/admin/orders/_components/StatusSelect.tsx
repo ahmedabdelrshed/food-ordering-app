@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -9,21 +10,19 @@ import {
 import { OrderStatus } from "@prisma/client";
 import { getStatusSelectOptions } from "./OrderStatus";
 
-interface StatusSelectProps {
-  value: OrderStatus;
-  onValueChange: (value: OrderStatus) => void;
-  onClick?: (e: React.MouseEvent) => void;
-}
-
-export function StatusSelect({
+export const StatusSelect = React.memo(function StatusSelect({
   value,
   onValueChange,
   onClick,
-}: StatusSelectProps) {
+}: {
+  value: OrderStatus;
+  onValueChange: (val: OrderStatus) => void;
+  onClick?: (e: React.MouseEvent) => void;
+}) {
   return (
     <Select
       value={value}
-      onValueChange={(value) => onValueChange(value as OrderStatus)}
+      onValueChange={(v) => onValueChange(v as OrderStatus)}
     >
       <SelectTrigger
         className="block w-full text-xs border-gray-300 rounded-md"
@@ -47,4 +46,4 @@ export function StatusSelect({
       </SelectContent>
     </Select>
   );
-}
+});

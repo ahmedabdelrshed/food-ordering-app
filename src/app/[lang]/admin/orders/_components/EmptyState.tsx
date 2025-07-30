@@ -1,12 +1,13 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
-
-interface EmptyStateProps {
+export const EmptyState = React.memo(function EmptyState({
+  searchTerm,
+  onClearSearch,
+}: {
   searchTerm: string;
   onClearSearch: () => void;
-}
-
-export function EmptyState({ searchTerm, onClearSearch }: EmptyStateProps) {
+}) {
   return (
     <tr>
       <td colSpan={9} className="px-6 py-12 text-center">
@@ -42,4 +43,4 @@ export function EmptyState({ searchTerm, onClearSearch }: EmptyStateProps) {
       </td>
     </tr>
   );
-}
+});

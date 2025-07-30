@@ -1,4 +1,4 @@
-// hooks/useOrdersTable.ts
+"use client";
 import { useCallback, useEffect, useState } from "react";
 import { OrderStatus } from "@prisma/client";
 import { supabase } from "@/lib/supabase";

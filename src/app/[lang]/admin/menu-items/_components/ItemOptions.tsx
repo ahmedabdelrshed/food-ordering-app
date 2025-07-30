@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useParams } from "next/navigation";
 import { Languages } from "@/lib/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OptionType, Props } from "./ItemOptionGroup";
 
 const ItemOptions = <T extends OptionType>({
@@ -24,6 +24,12 @@ const ItemOptions = <T extends OptionType>({
   name,
 }: Props<T>) => {
   const [names, setNames] = useState<string[]>(optionsNames);
+
+  useEffect(() => {
+    if (state.length === 0) {
+      setNames(optionsNames);
+    }
+  }, [state, optionsNames]);
   const addOption = () => {
     setState((prev) => [
       ...prev,

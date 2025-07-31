@@ -1,12 +1,38 @@
 import { cache } from "@/lib/cashe"
 import { db } from "@/lib/prisma"
 import { TProductWithRelations } from "@/types/product"
-export const getProductsBestSellers = cache(() => {
-    const products = db.product.findMany({ include: { sizes: true, extras: true } })
-    return products
-}, ['best-sellers'], {
-    revalidate: 3600
-})
+
+
+export const getProductsBestSellers = cache(async () => {
+    const bestSellerProductIdsAndCounts = await db.orderItem.groupBy({
+        by: ['productId'],
+        _count: { productId: true },
+        orderBy: { _count: { productId: 'desc' } },
+        take: 3,
+    });
+
+    const bestSellerIds = bestSellerProductIdsAndCounts.map(x => x.productId);
+
+    if (bestSellerIds.length === 0) return [];
+    const productsRaw = await db.product.findMany({
+        where: { id: { in: bestSellerIds } },
+        include: {
+            sizes: true,
+            extras: true
+        }
+    });
+
+    // 3. Sort result by order count (same as in bestSellerIds)
+    const idToCount = Object.fromEntries(
+        bestSellerProductIdsAndCounts.map(p => [p.productId, p._count.productId])
+    );
+    const products = productsRaw.sort(
+        (a, b) => idToCount[b.id] - idToCount[a.id]
+    );
+
+    return products;
+}, ['best-sellers'], { revalidate: 3600 });
+
 
 export const getProductsByCategory = cache(
     () => {
@@ -54,7 +80,6 @@ export const getProductById = cache(
     { revalidate: 3600 }
 );
 
-// server/db/products.ts
 export const getProductWithSearchPaginated = async ({
     categoryName = "",
     query = "",

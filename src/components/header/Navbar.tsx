@@ -9,6 +9,7 @@ import { Translations } from "@/types/translations";
 import { Session } from "next-auth";
 import { useClientSession } from "@/hooks/useClientSession";
 import { UserRole } from "@prisma/client";
+import AuthButtons from "./AuthButtons";
 
 function Navbar({
   translations,
@@ -102,6 +103,12 @@ function Navbar({
             </Link>
           </li>
         )}
+        <div className="md:hidden">
+          <AuthButtons
+            translations={translations}
+            initialSession={initialSession}
+          />
+        </div>
       </ul>
     </nav>
   );

@@ -19,10 +19,12 @@ const Header = async () => {
         </Link>
         <div className="flex items-center gap-4">
           <Navbar translations={translations} initialSession={initialSession} />
-          <AuthButtons
-            translations={translations}
-            initialSession={initialSession}
-          />
+          <div className="hidden md:block">
+            <AuthButtons
+              translations={translations}
+              initialSession={initialSession}
+            />
+          </div>
           <CartButton />
           <LanguageSwitcher />
         </div>

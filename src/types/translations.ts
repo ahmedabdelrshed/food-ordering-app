@@ -15,6 +15,7 @@ export type Translations = {
             description: string;
             orderNow: string;
             learnMore: string;
+            slogan: string;
         };
         bestSeller: {
             checkOut: string;

@@ -4,19 +4,23 @@ import { buttonVariants } from "@/components/ui/button";
 import { getCurrentLang } from "@/lib/getCurrentLang";
 import { cn } from "@/lib/utils";
 import { getCategories } from "@/server/db/categories";
-import { getProductWithSearch } from "@/server/db/products";
 import SearchInput from "./_components/SearchInput";
+import { getProductWithSearchPaginated } from "@/server/db/products";
 
+const PAGE_SIZE = 3;
 const MenuPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string;
-    query?: string; }>;
+  searchParams: Promise<{ category?: string; query?: string }>;
 }) => {
   const categoryName = (await searchParams).category ?? "";
   const query = (await searchParams).query ?? "";
   const categories = await getCategories();
-  const products = await getProductWithSearch(categoryName, query);
+  const { products, nextCursor } = await getProductWithSearchPaginated({
+    categoryName,
+    query,
+    limit: PAGE_SIZE,
+  });
   const lang = await getCurrentLang();
   return (
     <main className="mt-10">
@@ -52,7 +56,12 @@ const MenuPage = async ({
       </ul>
       <div className="container my-10">
         {products && products.length > 0 ? (
-          <Menu products={products} />
+          <Menu
+            initialNextCursor={nextCursor}
+            category={categoryName}
+            query={query}
+            initialProducts={products}
+          />
         ) : (
           <p className="text-center text-accent">No products found</p>
         )}

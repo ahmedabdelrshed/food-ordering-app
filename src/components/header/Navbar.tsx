@@ -9,6 +9,7 @@ import { Translations } from "@/types/translations";
 import { Session } from "next-auth";
 import { useClientSession } from "@/hooks/useClientSession";
 import { UserRole } from "@prisma/client";
+import AdminChatPanel from "@/app/[lang]/_components/AdminChatPanel";
 
 function Navbar({
   translations,
@@ -102,6 +103,7 @@ function Navbar({
             </Link>
           </li>
         )}
+        <AdminChatPanel />
       </ul>
     </nav>
   );

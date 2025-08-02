@@ -51,7 +51,7 @@ export default async function RootLayout({
             {children}
             <Footer />
             <Toaster />
-            <CustomerServiceChat customerId="dddddd"/>
+            <CustomerServiceChat />
           </NextAuthSessionProvider>
         </ReduxProvider>
       </body>

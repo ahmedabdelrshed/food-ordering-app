@@ -1,7 +1,7 @@
 import { authOptions } from "@/server/auth";
 import { UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import CustomerServiceChat from "./CustomerServiceChat";
+import CustomerServiceChat from "./CustomerChat/CustomerServiceChat";
 import AdminChatPanel from "./AdminChat/AdminChatPanel";
 
 const RenderChat = async () => {

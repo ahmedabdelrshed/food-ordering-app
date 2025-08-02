@@ -1,85 +1,41 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import PusherClient from "pusher-js";
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {  MessageCircle, Send } from "lucide-react";
-import { Message } from "@prisma/client";
+import { MessageCircle, Send } from "lucide-react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/Loader";
+import { Message } from "@prisma/client";
+import { useCustomerChat } from "@/hooks/useCustomerChat";
 
 export default function CustomerServiceChat() {
-  const [chatId, setChatId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const session = useSession();
   const customerId = session.data?.user?.id;
-  const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    if (!isOpen) return;
-    (async () => {
-      const res = await fetch("/api/chat/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerId }),
-      });
-      const data = await res.json();
-      setChatId(data.chatId);
-      setMessages(data.messages || []);
-      // Pusher subscription
-      if (data.chatId) {
-        const pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-          cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-        });
-        const channel = pusher.subscribe(`chat-${data.chatId}`);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        channel.bind("new-message", (payload: any) => {
-          console.log("new-message", payload);
-          setMessages((m) => [...m, payload.message]);
-        });
-        return () => {
-          channel.unbind_all();
-          channel.unsubscribe();
-          pusher.disconnect();
-        };
-      }
-    })();
-  }, [isOpen, customerId]);
+  const {
+    isOpen,
+    setIsOpen,
+    chatId,
+    messages,
+    newMessage,
+    setNewMessage,
+    sendMessage,
+    isLoading,
+    messagesEndRef,
+  } = useCustomerChat(customerId);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  async function sendMessage() {
-    if (!newMessage.trim() || !chatId) return;
+  async function handleSendMessage() {
     try {
-      setIsLoading(true);
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chatId,
-          content: newMessage,
-          senderType: "USER",
-        }),
-      });
-      setNewMessage("");
-    } catch (error) {
-      console.log(error);
+      await sendMessage();
+    } catch {
       toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -93,13 +49,13 @@ export default function CustomerServiceChat() {
           <MessageCircle className="h-6 w-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] ">
+      <DialogContent className="sm:max-w-md max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Customer Service</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col h-96 overflow-hidden">
           <ScrollArea className="h-full w-full px-6">
-            {messages.map((message) => (
+            {messages.map((message:Message) => (
               <div
                 key={message.id}
                 className={
@@ -129,7 +85,7 @@ export default function CustomerServiceChat() {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") sendMessage();
+                if (e.key === "Enter") handleSendMessage();
               }}
               placeholder="Type your message..."
               className="flex-1"
@@ -137,7 +93,7 @@ export default function CustomerServiceChat() {
               autoFocus
             />
             <Button
-              onClick={sendMessage}
+              onClick={handleSendMessage}
               size="icon"
               disabled={!newMessage.trim() || isLoading}
             >

@@ -162,7 +162,7 @@ export default function AdminChatPanel() {
                       <div
                         className={`inline-block p-3 rounded-lg max-w-xs ${
                           message.senderType === "ADMIN"
-                            ? "bg-blue-500 text-white"
+                            ? "bg-primary text-white"
                             : "bg-gray-200 text-gray-800"
                         }`}
                       >
@@ -183,8 +183,8 @@ export default function AdminChatPanel() {
                       if (e.key === "Enter") handleSendMessage();
                     }}
                     placeholder="Type your message..."
-                                      disabled={!selectedChat}
-                                      autoFocus
+                    disabled={!selectedChat}
+                    autoFocus
                   />
                   <Button
                     onClick={handleSendMessage}

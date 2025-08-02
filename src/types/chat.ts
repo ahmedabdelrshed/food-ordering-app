@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client"
+
 // types/chat.ts
 export interface Chat {
     id: string
@@ -50,3 +52,5 @@ export interface MessageData {
     senderId: string
     senderType: SenderType
 }
+
+export type TChatWithRelations = Prisma.ChatGetPayload<{ include: { messages: true, user: true } }>

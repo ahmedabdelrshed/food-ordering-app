@@ -98,7 +98,7 @@ export default function CustomerServiceChat() {
                 <div
                   className={`inline-block p-3 rounded-lg max-w-xs ${
                     message.senderType === "USER"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-200 text-gray-800"
                   }`}
                 >

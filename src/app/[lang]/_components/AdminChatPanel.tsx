@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Bell, ChevronLeft, Send, UserRound } from "lucide-react";
+import { ChevronLeft, MessageCircle, Send, UserRound } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,8 +106,11 @@ export default function AdminChatPanel() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-6 h-6" />
+        <Button
+          size="icon"
+          className="fixed bottom-6 cursor-pointer right-6 h-14 w-14 rounded-full shadow-lg z-50"
+        >
+          <MessageCircle className="h-6 w-6" />
           {notificationCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-xs px-2 py-0.5 font-bold">
               {notificationCount}

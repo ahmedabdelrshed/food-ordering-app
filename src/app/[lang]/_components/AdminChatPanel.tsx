@@ -9,13 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Bell,  ChartAreaIcon,  Send } from "lucide-react";
+import { Bell, ChevronLeft, Send, UserRound } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 export default function AdminChatPanel() {
   const [isOpen, setIsOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chats, setChats] = useState<any[]>([]);
   const [selectedChat, setSelectedChat] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -26,22 +28,20 @@ export default function AdminChatPanel() {
   async function fetchChats() {
     const res = await fetch("/api/chats");
     const data = await res.json();
-      setChats(data.chats);
+    setChats(data.chats);
   }
 
+  // Pusher for new chat/messages
   useEffect(() => {
     if (!isOpen) return;
     fetchChats();
-    // Listen for all incoming customer messages
     const pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
     });
-      const channel = pusher.subscribe("admin-chats");
-      channel.bind("new-message", ({ chatId, message }: any) => {
-        console.log("new-message", { chatId, message });
-        fetchChats();
-        setNotificationCount((c) => c + 1);
-      // optionally: if currently viewing this chat, refetch its messages
+    const channel = pusher.subscribe("admin-chats");
+    channel.bind("new-message", ({ chatId, message }: any) => {
+      fetchChats();
+      setNotificationCount((c) => c + 1);
       if (selectedChat && chatId === selectedChat.id)
         setMessages((prev) => [...prev, message]);
     });
@@ -53,27 +53,24 @@ export default function AdminChatPanel() {
     // eslint-disable-next-line
   }, [isOpen]);
 
-  function handleSelectChat(chat: any) {
-    setSelectedChat(chat);
-    setMessages(chat.messages);
-    setNotificationCount(0);
-
-    // Listen for new messages on this chat (admin replies and customer new)
+  // Pusher for selected chat
+  useEffect(() => {
+    if (!selectedChat || !isOpen) return;
+    setMessages(selectedChat.messages || []);
     const pusher = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
     });
-    const channel = pusher.subscribe(`chat-${chat.id}`);
-      channel.bind("new-message", (payload: any) => {
-        fetchChats();
-        console.log("new-message", payload);
+    const channel = pusher.subscribe(`chat-${selectedChat.id}`);
+    channel.bind("new-message", (payload: any) => {
       setMessages((prev) => [...prev, payload.message]);
+      fetchChats();
     });
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
       pusher.disconnect();
     };
-  }
+  }, [selectedChat, isOpen]);
 
   async function handleSendMessage() {
     if (!newMessage.trim() || !selectedChat) return;
@@ -93,6 +90,19 @@ export default function AdminChatPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  function handleSidebarToggle() {
+    setSidebarOpen((s) => !s);
+  }
+
+  function handleSelectChat(chat: any) {
+    setSelectedChat(chat);
+    setMessages(chat.messages);
+    setNotificationCount(0);
+  }
+
+  const dialogContentClasses =
+    "max-w-[1100px] w-full p-0 max-h-[92vh] h-[82vh] bg-white shadow-lg rounded-xl overflow-hidden";
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -105,99 +115,168 @@ export default function AdminChatPanel() {
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl p-0 h-[70vh]">
+      <DialogContent className={dialogContentClasses}>
         <DialogHeader>
-          <DialogTitle>Customer Service Chats</DialogTitle>
-          <div className="text-lg font-bold p-4 border-b">All User Chats</div>
+          <DialogTitle className="px-4 pt-4 pb-2 text-xl text-primary">
+            Customer Service Chats
+          </DialogTitle>
         </DialogHeader>
         <div className="flex h-full w-full overflow-hidden">
-          <aside className="w-64 border-r h-full overflow-y-auto bg-gray-50">
-            <ScrollArea className="h-full">
-              {chats.length === 0 ? (
-                <div className="p-6 text-gray-500">No chats yet.</div>
-              ) : (
-                chats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer border-b ${
-                      selectedChat?.id === chat.id
-                        ? "bg-blue-100 font-bold"
-                        : ""
+          {/* Sidebar */}
+          <aside
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              sidebarOpen ? "w-80 border-r bg-gray-50" : "w-0"
+            }`}
+          >
+            <div className={`${sidebarOpen ? "block" : "hidden"}`}>
+              <div className="flex items-center justify-between p-3 border-b bg-white">
+                <span className="font-semibold text-gray-600">User Chats</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Close sidebar"
+                  onClick={handleSidebarToggle}
+                >
+                  <ChevronLeft
+                    className={`w-4 h-4 transition-transform ${
+                      !sidebarOpen ? "rotate-180" : ""
                     }`}
-                    onClick={() => handleSelectChat(chat)}
-                  >
-                    <ChartAreaIcon className="h-6 w-6 mr-2 text-blue-500" />
-                    <div>
-                      <div>{chat.user?.name || chat.userId}</div>
-                      <div className="text-xs text-gray-400">
-                        {chat.messages.at(-1)?.content?.slice(0, 32)}
+                  />
+                </Button>
+              </div>
+              <ScrollArea className="h-[calc(80vh-120px)]">
+                {chats.length === 0 ? (
+                  <div className="p-6 text-gray-500">No chats yet.</div>
+                ) : (
+                  chats.map((chat) => (
+                    <div
+                      key={chat.id}
+                      className={`flex items-center gap-3 p-4 hover:bg-blue-50 cursor-pointer border-b transition-colors ${
+                        selectedChat?.id === chat.id
+                          ? "bg-blue-100 font-bold"
+                          : ""
+                      }`}
+                      onClick={() => handleSelectChat(chat)}
+                    >
+                      {chat.user?.image ? (
+                        <Image
+                          src={chat.user.image}
+                          alt={chat.user?.name || ""}
+                          width={32}
+                          height={32}
+                          className="rounded-full object-cover border"
+                        />
+                      ) : (
+                        <UserRound className="h-8 w-8 text-gray-400 bg-gray-200 rounded-full p-1" />
+                      )}
+                      <div className="flex flex-col truncate">
+                        <span className="truncate">
+                          {chat.user?.name || chat.userId}
+                        </span>
+                        <span className="text-xs text-gray-400 truncate max-w-[140px]">
+                          {chat.messages.at(-1)?.content?.slice(0, 48)}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
-            </ScrollArea>
+                  ))
+                )}
+              </ScrollArea>
+            </div>
           </aside>
-          <section className="flex flex-col flex-1 h-full">
+
+          {/* Main Chat Area */}
+          <section className="relative flex flex-col flex-1 h-full bg-white transition-all duration-300 ease-in-out">
+            {/* Show reopen sidebar button if sidebar is closed */}
+            {!sidebarOpen && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSidebarToggle}
+                className="absolute left-2 top-4 z-10 bg-white shadow-sm border rounded-full hover:bg-gray-100"
+              >
+                <ChevronLeft className="w-5 h-5 rotate-180 text-gray-600" />
+              </Button>
+            )}
             {selectedChat ? (
               <>
-                <div className="flex items-center border-b p-3 bg-white">
-                  <span className="font-semibold">
-                    {selectedChat.user?.name || selectedChat.userId}
-                  </span>
-                  <span className="text-xs ml-2 text-gray-500">
-                    {selectedChat.user?.email}
-                  </span>
+                <div className="flex items-center border-b p-4 gap-3">
+                  {selectedChat.user?.image ? (
+                    <Image
+                      src={selectedChat.user.image}
+                      alt={selectedChat.user?.name || ""}
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover border"
+                    />
+                  ) : (
+                    <UserRound className="h-10 w-10 text-gray-400 bg-gray-200 rounded-full p-1" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="block font-semibold truncate">
+                      {selectedChat.user?.name || selectedChat.userId}
+                    </span>
+                    <span className="block text-xs text-gray-500 truncate">
+                      {selectedChat.user?.email}
+                    </span>
+                  </div>
                 </div>
-                <ScrollArea className="flex-1 p-4 overflow-y-auto">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={
-                        message.senderType === "ADMIN"
-                          ? "text-right mb-4"
-                          : "text-left mb-4"
-                      }
+                <div className="flex flex-col flex-1 h-96">
+                  <ScrollArea className="flex-1 h-96 overflow-y-auto px-4 bg-white">
+                    {messages.length === 0 ? (
+                      <div className="h-full flex text-sm items-center text-gray-400 justify-center">
+                        No messages yet.
+                      </div>
+                    ) : (
+                      messages.map((message: any) => (
+                        <div
+                          key={message.id}
+                          className={
+                            message.senderType === "ADMIN"
+                              ? "text-right mb-4"
+                              : "text-left mb-4"
+                          }
+                        >
+                          <div
+                            className={`inline-block p-3 break-all rounded-lg max-w-[65%] ${
+                              message.senderType === "ADMIN"
+                                ? "bg-primary text-white"
+                                : "bg-gray-200 text-gray-800"
+                            }`}
+                          >
+                            {message.content}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {new Date(message.createdAt).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                    <div ref={messagesEndRef} />
+                  </ScrollArea>
+                  <div className="p-4 border-t flex gap-2 bg-white shrink-0">
+                    <Input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSendMessage();
+                      }}
+                      placeholder="Type your message..."
+                      disabled={!selectedChat}
+                      autoFocus
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      size="icon"
+                      disabled={!newMessage.trim()}
                     >
-                      <div
-                        className={`inline-block p-3 rounded-lg max-w-xs ${
-                          message.senderType === "ADMIN"
-                            ? "bg-primary text-white"
-                            : "bg-gray-200 text-gray-800"
-                        }`}
-                      >
-                        {message.content}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {new Date(message.createdAt).toLocaleTimeString()}
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </ScrollArea>
-                <div className="p-4 border-t flex gap-2 bg-white">
-                  <Input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSendMessage();
-                    }}
-                    placeholder="Type your message..."
-                    disabled={!selectedChat}
-                    autoFocus
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    size="icon"
-                    disabled={!newMessage.trim()}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </>
             ) : (
               <div className="flex flex-col flex-1 items-center justify-center text-gray-500">
-                Select a user chat to start viewing messages.
+                Select a chat from the left to start viewing messages.
               </div>
             )}
           </section>

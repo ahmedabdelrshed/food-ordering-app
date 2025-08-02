@@ -11,9 +11,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send } from "lucide-react";
+import {  MessageCircle, Send } from "lucide-react";
 import { Message } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
+import Loader from "@/components/ui/Loader";
 
 export default function CustomerServiceChat() {
   const [chatId, setChatId] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export default function CustomerServiceChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const session = useSession();
   const customerId = session.data?.user?.id;
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (!isOpen) return;
     (async () => {
@@ -61,13 +63,24 @@ export default function CustomerServiceChat() {
 
   async function sendMessage() {
     if (!newMessage.trim() || !chatId) return;
-   
-    await fetch("/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId, content: newMessage, senderType: "USER" }),
-    });
-    setNewMessage("");
+    try {
+      setIsLoading(true);
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chatId,
+          content: newMessage,
+          senderType: "USER",
+        }),
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -96,7 +109,7 @@ export default function CustomerServiceChat() {
                 }
               >
                 <div
-                  className={`inline-block p-3 rounded-lg max-w-xs ${
+                  className={`inline-block p-3 break-all rounded-lg max-w-xs ${
                     message.senderType === "USER"
                       ? "bg-primary text-white"
                       : "bg-gray-200 text-gray-800"
@@ -126,9 +139,9 @@ export default function CustomerServiceChat() {
             <Button
               onClick={sendMessage}
               size="icon"
-              disabled={!newMessage.trim()}
+              disabled={!newMessage.trim() || isLoading}
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? <Loader /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
         </div>

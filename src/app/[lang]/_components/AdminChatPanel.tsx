@@ -14,6 +14,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import toast from "react-hot-toast";
+import Loader from "@/components/ui/Loader";
 
 export default function AdminChatPanel() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,7 @@ export default function AdminChatPanel() {
   const [notificationCount, setNotificationCount] = useState(0);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchChats() {
     const res = await fetch("/api/chats");
@@ -74,16 +77,25 @@ export default function AdminChatPanel() {
 
   async function handleSendMessage() {
     if (!newMessage.trim() || !selectedChat) return;
-    await fetch("/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chatId: selectedChat.id,
-        content: newMessage,
-        senderType: "ADMIN",
-      }),
-    });
-    setNewMessage("");
+      try {
+        setIsLoading(true);
+        await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatId: selectedChat.id,
+            content: newMessage,
+            senderType: "ADMIN",
+          }),
+        });
+        setNewMessage("");
+    
+   } catch (error) {
+          console.log(error);
+          toast.error("Something went wrong. Please try again.");
+   }finally {
+        setIsLoading(false);
+   }
   }
 
   useEffect(() => {
@@ -270,9 +282,9 @@ export default function AdminChatPanel() {
                     <Button
                       onClick={handleSendMessage}
                       size="icon"
-                      disabled={!newMessage.trim()}
+                      disabled={!newMessage.trim() || isLoading}
                     >
-                      <Send className="h-4 w-4" />
+                      {isLoading ? <Loader /> : <Send className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>

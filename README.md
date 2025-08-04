@@ -1,6 +1,3 @@
-Certainly! Below is the complete professional README content formatted as plain text that you can directly put into your `README.md` file:
-
-```markdown
 # Food Ordering App
 
 A full-stack food ordering application built with [Next.js](https://nextjs.org), Prisma, PostgreSQL, and Cloudinary.
@@ -83,6 +80,3 @@ Production site: [http://food-ordering-app-puce-five.vercel.app](http://food-ord
 ## License
 
 This project is licensed under the MIT License.
-```
-
-You can copy and paste all the above text as is into your README.md file. Let me know if you want it tailored further or formatted with specific badges or images!

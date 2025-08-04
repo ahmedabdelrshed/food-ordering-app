@@ -1,19 +1,20 @@
-import { authOptions } from "@/server/auth";
+"use client";
 import { UserRole } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import CustomerServiceChat from "./CustomerChat/CustomerServiceChat";
 import AdminChatPanel from "./AdminChat/AdminChatPanel";
+import { useSession } from "next-auth/react";
 
-const RenderChat = async () => {
-  const session = await getServerSession(authOptions);
+const RenderChat = () => {
+  const session = useSession().data;
   const userRole = session?.user.role as UserRole;
   return (
     <div>
-      {userRole === UserRole.ADMIN ? (
-        <AdminChatPanel />
-      ) : (
-        <CustomerServiceChat />
-      )}
+      {session &&
+        (userRole === UserRole.ADMIN ? (
+          <AdminChatPanel />
+        ) : (
+          <CustomerServiceChat />
+        ))}
     </div>
   );
 };

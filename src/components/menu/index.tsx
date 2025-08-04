@@ -42,7 +42,15 @@ const MenuInfinite: React.FC<MenuInfiniteProps> = ({
       });
       const res = await fetch(`/api/products?${params.toString()}`);
       const data = await res.json();
-      setProducts((prev) => [...prev, ...data.products]);
+      // ✅ Prevent duplicate keys here
+      setProducts((prev) => {
+        const existingIds = new Set(prev.map((p) => p.id));
+        const newItems = data.products.filter(
+          (p: TProductWithRelations) => !existingIds.has(p.id)
+        );
+        return [...prev, ...newItems];
+      });
+
       setNextCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
     } finally {
